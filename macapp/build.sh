@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 ROOT="$(cd .. && pwd)"
-VERSION="1.0.0"
+VERSION="1.1.0"
 NAME="Agent Command Center"
 APP="build/$NAME.app"
 
