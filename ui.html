@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Command Center</title>
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--panel2:#f0f2f5;--line:#e3e6eb;--text:#1b1f24;--muted:#6a737d;
+  --accent:#2ea043;--accent2:#238636;--accent-soft:#2ea04318;--danger:#d1242f;--danger-soft:#d1242f14;
+  --blue:#0969da;--blue-soft:#0969da14;--purple:#8250df;--purple-soft:#8250df16;--shadow:0 1px 2px #0000000d,0 4px 14px #0000000a;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0d1014;--panel:#161b22;--panel2:#1c222b;--line:#2a313c;--text:#e6edf3;--muted:#8b949e;
+  --accent-soft:#2ea04326;--danger:#f85149;--danger-soft:#f8514920;--blue:#58a6ff;--blue-soft:#58a6ff1c;
+  --purple:#bc8cff;--purple-soft:#bc8cff1f;--shadow:0 1px 2px #0006,0 6px 20px #0004;
+}}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:22px 24px 60px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:650;letter-spacing:-.2px}
+.brand svg{width:30px;height:30px}
+.spacer{flex:1}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:130px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:18px;font-weight:650;letter-spacing:-.3px}
+.stat span{color:var(--muted);font-size:12px}
+.stat.click{cursor:pointer}
+.group{display:flex;flex-direction:column;gap:6px}
+.group>label{font-size:11px;font-weight:650;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);padding-left:2px}
+.group>div{display:flex;gap:8px;flex-wrap:wrap}
+.stats{gap:22px!important}
+.detail{padding:4px 16px 16px 38px;background:var(--panel2);border-top:1px solid var(--line);font-size:13px}
+.detail h5{margin:12px 0 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.detail p{margin:0;white-space:pre-wrap;word-break:break-word}
+.detail ul{margin:2px 0 0;padding-left:18px;color:var(--muted)}
+.item.click{cursor:pointer}.item.click:hover{background:var(--panel2)}
+select.wide{width:100%;margin-bottom:14px}.stat.click:hover{border-color:var(--accent)}
+nav{display:flex;gap:4px;margin:18px 0 16px;background:var(--panel2);padding:4px;border-radius:10px;width:max-content}
+nav button{border:0;background:none;color:var(--muted);padding:7px 16px;border-radius:7px;font-weight:550;box-shadow:none}
+nav button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+button{font:inherit;font-size:13px;font-weight:550;cursor:pointer;border-radius:8px;padding:6px 12px;border:1px solid var(--line);background:var(--panel);color:var(--text);transition:.12s}
+button:hover{background:var(--panel2)}
+button:disabled{opacity:.45;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover{background:var(--accent2)}
+button.ghost{border-color:transparent;background:none;color:var(--muted)}
+button.ghost:hover{background:var(--panel2);color:var(--text)}
+button.danger{color:var(--danger)}button.danger:hover{background:var(--danger-soft)}
+button.dangerfill{background:var(--danger);border-color:var(--danger);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin:0;font-size:15px;font-weight:650;display:flex;align-items:center;gap:8px;min-width:0}
+.card h3 .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top{display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}.dot.on{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.meta{color:var(--muted);font-size:12.5px;margin-top:4px}
+.mem{font-variant-numeric:tabular-nums;font-size:12.5px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue-soft);color:var(--blue);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12px;padding:3px 9px;border-radius:20px;background:var(--purple-soft);color:var(--purple);cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip:hover{filter:brightness(1.15)}
+.tag{font-size:11px;font-weight:600;padding:1px 7px;border-radius:20px;background:var(--panel2);color:var(--muted)}
+.tag.green{background:var(--accent-soft);color:var(--accent)}
+.actions{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.list{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.item{display:flex;align-items:center;gap:14px;padding:13px 16px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .body{flex:1;min-width:0}
+.item .acts{display:flex;gap:4px;flex:none}
+.older{background:var(--panel2)}
+.older .item{padding:8px 16px 8px 34px;font-size:13px}
+.more{font-size:12px;color:var(--blue);cursor:pointer;margin-left:6px;font-weight:550}
+.empty{color:var(--muted);text-align:center;padding:40px 10px}
+.empty b{display:block;color:var(--text);font-size:15px;margin-bottom:4px}
+.sec{margin-bottom:14px}
+.sec h4{margin:0 0 2px;font-size:14px;font-weight:650}
+.sec p.hint{margin:0 0 12px;color:var(--muted);font-size:12.5px}
+.opt{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.opt:first-of-type{border-top:0}
+.opt .l{flex:1}.opt .l small{display:block;color:var(--muted);font-size:12px}
+select,input[type=number],input[type=text]{font:inherit;font-size:13px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text)}
+input[type=number]{width:70px}
+.sw{position:relative;width:38px;height:22px;flex:none}
+.sw input{opacity:0;width:0;height:0}
+.sw i{position:absolute;inset:0;border-radius:22px;background:var(--line);transition:.15s;cursor:pointer}
+.sw i:before{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:.15s}
+.sw input:checked+i{background:var(--accent)}.sw input:checked+i:before{transform:translateX(16px)}
+.preview{border-radius:12px;padding:14px 16px;background:var(--panel2);margin-top:4px}
+.preview ul{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12.5px;max-height:180px;overflow:auto}
+.row{display:flex;gap:10px;align-items:center}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:550;transition:.2s;pointer-events:none;box-shadow:var(--shadow);max-width:80vw}
+#toast.show{opacity:1;transform:translateX(-50%)}#toast.err{background:var(--danger);color:#fff}
+.modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal.show{display:flex}
+.dialog{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;width:360px;box-shadow:0 20px 50px #0005}
+.dialog h3{margin:0 0 6px;font-size:15px}.dialog p{margin:0 0 14px;color:var(--muted);font-size:13px}
+.dialog input{width:100%;margin-bottom:14px}
+.dialog .row{justify-content:flex-end}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="22" fill="#1b2029"/><rect x="12" y="14" width="40" height="56" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="3"/><rect x="57" y="14" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><path d="M72.5 17Q74 25 81 26.5Q74 28 72.5 36Q71 28 64 26.5Q71 25 72.5 17Z" fill="#bc8cff"/><rect x="57" y="45" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><rect x="62" y="52" width="18" height="3" rx="1.5" fill="#8b949e88"/><rect x="62" y="59" width="12" height="3" rx="1.5" fill="#8b949e88"/><path d="M19 27l8 6-8 6" stroke="#3fb950" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="31" y="37" width="10" height="3" rx="1.5" fill="#e6edf3"/><rect x="12" y="76" width="76" height="11" rx="4" fill="#2ea043"/></svg>
+      <div>Agent Command Center<div class="meta" style="margin:0;font-weight:400">tmux + Copilot sessions</div></div>
+    </div>
+    <div class="spacer"></div>
+    <button onclick="saveAll()">Save all</button>
+    <button class="primary" onclick="newSession()">+ New session</button>
+  </header>
+
+  <div class="stats" id="stats"></div>
+  <div id="banner"></div>
+
+  <nav id="tabs">
+    <button data-t="sessions" class="on">tmux</button>
+    <button data-t="copilot">Copilot</button>
+    <button data-t="snapshots">Snapshots</button>
+    <button data-t="cleanup">Clean up</button>
+    <button data-t="settings">Settings</button>
+  </nav>
+
+  <section id="sessions"></section>
+  <section id="copilot" hidden></section>
+  <section id="snapshots" hidden></section>
+  <section id="cleanup" hidden></section>
+  <section id="settings" hidden></section>
+</div>
+
+<div id="toast"></div>
+<div class="modal" id="modal"><div class="dialog">
+  <h3 id="mTitle"></h3><p id="mText"></p><input id="mInput" type="text" hidden><select id="mSelect" class="wide" hidden></select>
+  <div class="row"><button class="ghost" id="mCancel">Cancel</button><button class="primary" id="mOk">OK</button></div>
+</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const arg = s => esc(JSON.stringify(s));
+const native = window.webkit?.messageHandlers?.tm;
+let S = null, tab = 'sessions';
+const openGroups = new Set();
+
+// ---------- formatting
+function size(b){ if(!b) return '0 B'; const u=['B','KB','MB','GB']; let i=0; while(b>=1024&&i<3){b/=1024;i++} return (b>=100||i==0?Math.round(b):b.toFixed(1))+' '+u[i]; }
+function ago(t){ const s=Math.max(0,Date.now()/1000-t); if(s<60) return 'just now'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+const plural = (n,w) => `${n} ${w}${n==1?'':'s'}`;
+
+// ---------- api / ui helpers
+async function api(path, body){
+  const r = await fetch(path, {method: body?'POST':'GET', headers:{'Content-Type':'application/json','X-Tmux-Manager':'1'}, body: body?JSON.stringify(body):undefined});
+  const j = await r.json(); if(!r.ok) throw new Error(j.error || r.statusText); return j;
+}
+let toastT;
+function toast(t, err){ const e=$('toast'); e.textContent=t; e.className='show'+(err?' err':''); clearTimeout(toastT); toastT=setTimeout(()=>e.className='',2600); }
+async function run(fn){ try{ const r=await fn(); if(r?.message) toast(r.message); return r; }catch(e){ toast(e.message,true); } finally{ refresh(); } }
+function modal({title, text='', input=null, choices=null, ok='OK', danger=false}){
+  return new Promise(res=>{
+    $('mTitle').textContent=title; $('mText').textContent=text; $('mText').hidden=!text;
+    const inp=$('mInput'); inp.hidden=input===null; inp.value=input??'';
+    const sel=$('mSelect'); sel.hidden=!choices;
+    if(choices) sel.innerHTML=choices.map(([v,t])=>`<option value="${esc(v)}">${esc(t)}</option>`).join('');
+    $('mOk').textContent=ok; $('mOk').className=danger?'dangerfill':'primary';
+    $('modal').classList.add('show'); (input!==null?inp:$('mOk')).focus();
+    const done=v=>{ $('modal').classList.remove('show'); $('mOk').onclick=$('mCancel').onclick=inp.onkeydown=null; res(v); };
+    $('mOk').onclick=()=>done(choices?sel.value:input!==null?inp.value.trim():true);
+    $('mCancel').onclick=()=>done(choices||input!==null?null:false);
+    inp.onkeydown=e=>{ if(e.key=='Enter') $('mOk').click(); if(e.key=='Escape') $('mCancel').click(); };
+  });
+}
+document.addEventListener('keydown',e=>{ if(e.key=='Escape'&&$('modal').classList.contains('show')) $('mCancel').click(); });
+
+// ---------- actions
+function attach(name){
+  const cmd=`tmux attach -t '=${name}'`, term=S?.settings.terminal||'auto';
+  if(native && term!='copy') native.postMessage({action:'terminal', command:cmd, app:term});
+  else { copy(cmd); }
+}
+function copy(t){
+  if(native) native.postMessage({action:'copy', text:t}); else navigator.clipboard?.writeText(t);
+  toast('Copied: '+t);
+}
+function copyResume(id){ copy(`${S.settings.copilot_cmd} --resume=${id}`); }
+const cpTitle = c => c.title || 'Untitled session';
+async function cpStop(id,title){ if(await modal({title:`Stop “${title}”?`, text:'Ends the Copilot process to free memory. You can resume it later.', ok:'Stop', danger:true})) run(()=>api('/api/copilot/stop',{id})); }
+// Ask where to run a Copilot session in tmux: a new session or a window in an existing one.
+async function pickTmux(title, ok){
+  const choices=[['', 'New tmux session'], ...S.sessions.map(s=>[s.name, `New window in “${s.name}”`])];
+  return modal({title, text:'Choose where it should run.', choices, ok});
+}
+async function cpResumeTmux(id,title){
+  const target=await pickTmux(`Resume “${title}” in tmux`, 'Resume'); if(target===null) return;
+  const r=await run(()=>api('/api/copilot/resume',{id, target:target||null})); if(r?.name) attach(r.name);
+}
+async function cpMove(id,title,app){
+  const target=await pickTmux(`Move “${title}” to tmux`, 'Move'); if(target===null) return;
+  if(!await modal({title:'Move it now?', text:`This ends it in ${app||'its terminal'} and resumes it in tmux, so it keeps running after you close that window.`, ok:'Move'})) return;
+  const r=await run(()=>api('/api/copilot/move',{id, target:target||null})); if(r?.name) attach(r.name);
+}
+const shq = s => "'"+String(s).replace(/'/g,"'\\''")+"'";
+function cpResume(c){
+  const cmd=`${c.cwd?`cd ${shq(c.cwd)} && `:''}${S.settings.copilot_cmd} --resume=${c.id}`, term=S.settings.terminal;
+  if(native && term!='copy') native.postMessage({action:'terminal', command:cmd, app:term}); else copy(cmd);
+}
+async function cpDelete(id,title,sz){
+  if(!await modal({title:`Delete “${title}”?`, text:`Moves its saved state (${size(sz)}) to the Trash. It can no longer be resumed unless you put it back.`, ok:'Delete', danger:true})) return;
+  openCp.delete(id); run(()=>api('/api/copilot/delete',{id}));
+}
+const openCp=new Set(), cpDetails={};
+async function cpToggle(id){
+  if(openCp.has(id)){ openCp.delete(id); renderCopilot(); return; }
+  openCp.add(id); renderCopilot();
+  try{ cpDetails[id]=await api('/api/copilot/detail',{id}); }catch(e){ cpDetails[id]={error:e.message}; }
+  renderCopilot();
+}
+function cpDetailHtml(id){
+  const d=cpDetails[id];
+  if(!d) return `<div class="detail"><p class="meta">Loading…</p></div>`;
+  if(d.error) return `<div class="detail"><p class="meta">${esc(d.error)}</p></div>`;
+  const sec=(h,body)=>body?`<h5>${h}</h5>${body}`:'';
+  const summary = d.overview || (d.first_ask ? `Started with: ${d.first_ask}` : '');
+  const facts=[d.turns?plural(d.turns,'request'):'', d.file_count?plural(d.file_count,'file')+' touched':'',
+    d.repository?esc(d.repository)+(d.branch?' @ '+esc(d.branch):''):'', d.model?esc(d.model):'', size(d.size)+' on disk'].filter(Boolean).join(' · ');
+  return `<div class="detail">
+    ${sec('Summary', summary?`<p>${esc(summary)}</p>`:'<p class="meta">No summary recorded yet.</p>')}
+    ${sec('Next steps', d.next_steps&&`<p>${esc(d.next_steps)}</p>`)}
+    ${sec('Last request', d.last_ask&&d.last_ask!==d.first_ask&&`<p>${esc(d.last_ask)}</p>`)}
+    ${sec('Last reply', d.last_reply&&`<p class="meta">${esc(d.last_reply)}</p>`)}
+    ${sec('Checkpoints', d.checkpoints.length&&`<ul>${d.checkpoints.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`)}
+    ${sec('PRs & commits', d.refs.length&&`<ul>${d.refs.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`)}
+    ${sec('Recent files', d.files.length&&`<ul>${d.files.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`)}
+    <h5>Details</h5><p class="meta">${facts} · <span class="more" style="margin:0" onclick="copy(${arg(d.id)})">${esc(d.id)}</span></p>
+  </div>`;
+}
+let cpFilter='', cpShow=15;
+async function newSession(){
+  const name=await modal({title:'New session', text:'Letters, numbers, dot, dash or underscore.', input:'', ok:'Create'});
+  if(!name) return;
+  const r=await run(()=>api('/api/new',{name})); if(r) attach(name);
+}
+const save = name => run(()=>api('/api/save',{name}));
+const saveAll = () => run(()=>api('/api/saveall',{}));
+async function closeSess(name){ if(await modal({title:`Close ${name}?`, text:'It is saved first, so you can restore it later.', ok:'Save & close'})) run(()=>api('/api/savekill',{name})); }
+async function killSess(name){ if(await modal({title:`Kill ${name}?`, text:'Ends it without saving.', ok:'Kill', danger:true})) run(()=>api('/api/kill',{name})); }
+async function restore(file, session, rename){
+  let name=null;
+  if(rename){ name=await modal({title:'Restore as…', text:`New name for a copy of ${session}.`, input:session+'-2', ok:'Restore'}); if(!name) return; }
+  const r=await run(()=>api('/api/restore',{file, name}));
+  if(r?.name && native) attach(r.name);
+}
+async function delSnap(file){ if(await modal({title:'Delete snapshot?', ok:'Delete', danger:true})) run(()=>api('/api/delete',{file})); }
+function toggleGroup(n){ openGroups.has(n)?openGroups.delete(n):openGroups.add(n); renderSnapshots(); }
+async function setSetting(k, v){ try{ const r=await api('/api/settings',{[k]:v}); S.settings=r.settings; toast('Saved'); renderStats(); if(tab=='cleanup') renderCleanup(); }catch(e){ toast(e.message,true); } }
+
+// ---------- render
+function renderStats(){
+  const ss=S.sessions, run=S.copilot.running, cps=run.length;
+  const disk=S.snapshots.reduce((a,s)=>a+s.size,0), st=S.settings;
+  const auto = st.autosave ? (S.last_autosave ? ago(S.last_autosave) : 'pending') : 'off';
+  const tmem=ss.reduce((a,s)=>a+s.rss,0), cmem=run.reduce((a,c)=>a+c.rss,0);
+  $('stats').innerHTML=`
+    <div class="group"><label>tmux</label><div>
+      <div class="stat click" onclick="show('sessions')"><b>${ss.length}</b><span>${ss.length==1?'session':'sessions'} running</span></div>
+      <div class="stat"><b>${size(tmem)}</b><span>memory</span></div>
+      <div class="stat click" onclick="show('snapshots')"><b>${S.snapshots.length}</b><span>snapshots · ${size(disk)}</span></div>
+      <div class="stat click" onclick="show('settings')"><b>${auto}</b><span>auto-save${st.autosave?` · every ${st.interval_min}m`:''}</span></div>
+    </div></div>
+    <div class="group"><label>Copilot</label><div>
+      <div class="stat click" onclick="show('copilot')"><b>${cps}</b><span>running</span></div>
+      <div class="stat"><b>${size(cmem)}</b><span>memory</span></div>
+      <div class="stat click" onclick="show('copilot')"><b>${S.copilot.total}</b><span>saved · ${size(S.copilot.total_size)}</span></div>
+    </div></div>`;
+}
+
+function copilotChips(list){
+  if(!list.length) return '';
+  return `<div class="chips">${list.map(c=>`<span class="chip" title="Click to copy the resume command" onclick="copyResume(${arg(c.id)})">✦ ${esc(cpTitle(c))}${c.rss?` · ${size(c.rss)}`:''}</span>`).join('')}</div>`;
+}
+
+function renderSessions(){
+  const ss=S.sessions;
+  if(!ss.length){ $('sessions').innerHTML=`<div class="list"><div class="empty"><b>No tmux sessions running</b>Create one, or restore from Snapshots.</div></div>`; return; }
+  $('sessions').innerHTML=`<div class="grid">${ss.map(s=>`
+    <div class="card">
+      <div class="top"><h3><span class="dot ${s.attached?'on':''}" title="${s.attached?'Attached':'Detached'}"></span><span class="n">${esc(s.name)}</span></h3>
+        <div class="spacer"></div><span class="mem" title="Memory used by everything running in this session">${size(s.rss)}</span></div>
+      <div class="meta">${plural(s.windows,'window')} · ${plural(s.panes,'pane')} · active ${ago(s.activity)}</div>
+      ${copilotChips(s.copilot)}
+      <div class="actions">
+        <button class="primary" onclick="attach(${arg(s.name)})">Attach</button>
+        <button onclick="save(${arg(s.name)})">Save</button>
+        <button onclick="closeSess(${arg(s.name)})" title="Save, then end the session">Close</button>
+        <div class="spacer"></div>
+        <button class="ghost danger" onclick="killSess(${arg(s.name)})" title="End without saving">Kill</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function renderCopilot(){
+  const {running, recent}=S.copilot;
+  const home=p=>esc((p||'').replace(/^\/(Users|home)\/[^/]+/,'~'));
+  const runRows = running.map(c=>`<div class="item click" onclick="cpToggle(${arg(c.id)})">
+      <span class="dot on"></span>
+      <div class="body"><div class="row"><b>${esc(cpTitle(c))}</b>${c.tmux?`<span class="tag green">tmux: ${esc(c.tmux)}</span>`:`<span class="tag">${esc(c.app||'terminal')}${c.tty?' · '+esc(c.tty):''}</span>`}</div>
+        <div class="meta">${home(c.cwd)} · active ${ago(c.last_active)}</div></div>
+      <span class="mem" title="Memory">${size(c.rss)}</span>
+      <div class="acts" onclick="event.stopPropagation()">
+        ${c.tmux?`<button class="primary" onclick="attach(${arg(c.tmux)})">Attach</button>`
+                :`<button onclick="cpMove(${arg(c.id)},${arg(cpTitle(c))},${arg(c.app)})">Move to tmux…</button>`}
+        <button class="ghost danger" onclick="cpStop(${arg(c.id)},${arg(cpTitle(c))})">Stop</button>
+      </div></div>${openCp.has(c.id)?cpDetailHtml(c.id):''}`).join('');
+  const f=cpFilter.toLowerCase();
+  const list=recent.filter(c=>!f||(c.title+' '+c.cwd+' '+c.id).toLowerCase().includes(f));
+  const recRows = list.slice(0,cpShow).map(c=>`<div class="item click" onclick="cpToggle(${arg(c.id)})">
+      <span class="dot"></span>
+      <div class="body"><b>${esc(cpTitle(c))}</b>
+        <div class="meta">${home(c.cwd)} · ${ago(c.last_active)} · ${size(c.size)}</div></div>
+      <div class="acts" onclick="event.stopPropagation()">
+        <button class="primary" onclick='cpResume(${esc(JSON.stringify({id:c.id,cwd:c.cwd}))})' title="Open in your terminal">Resume</button>
+        <button onclick="cpResumeTmux(${arg(c.id)},${arg(cpTitle(c))})">Resume in tmux…</button>
+        <button class="ghost danger" onclick="cpDelete(${arg(c.id)},${arg(cpTitle(c))},${c.size})">Delete</button>
+      </div></div>${openCp.has(c.id)?cpDetailHtml(c.id):''}`).join('');
+  const focused=document.activeElement?.id=='cpq';
+  $('copilot').innerHTML=`
+    <p class="meta" style="margin:0 0 12px">Click a session to see its summary.</p>
+    <div class="sec"><h4 style="margin:0 0 8px">Running <span class="meta">· ${running.length}</span></h4>
+      <div class="list">${runRows||'<div class="empty"><b>No Copilot sessions running</b>Resume one below.</div>'}</div></div>
+    <div class="sec" style="margin-top:22px"><div class="row" style="margin-bottom:8px"><h4 style="margin:0">Saved <span class="meta">· ${S.copilot.total-running.length}</span></h4><div class="spacer"></div>
+      <input type="text" id="cpq" placeholder="Search title, folder, id…" value="${esc(cpFilter)}" oninput="cpFilter=this.value;cpShow=15;renderCopilot()" style="width:240px"></div>
+      <div class="list">${recRows||'<div class="empty">Nothing found</div>'}</div>
+      ${list.length>cpShow?`<div style="text-align:center;margin-top:10px"><button class="ghost" onclick="cpShow+=30;renderCopilot()">Show more (${list.length-cpShow})</button></div>`:''}</div>`;
+  if(focused){ const q=$('cpq'); q.focus(); q.setSelectionRange(q.value.length,q.value.length); }
+}
+
+function snapLine(s){
+  const cps=s.copilot?.length?` · ✦ ${esc(s.copilot.join(', '))}`:'';
+  return `${ago(s.saved_at)} · ${s.auto?'auto':'manual'} · ${plural(s.windows,'window')}, ${plural(s.panes,'pane')} · ${size(s.size)}${cps}`;
+}
+function renderSnapshots(){
+  const groups={}; for(const s of S.snapshots) (groups[s.session] ??= []).push(s);
+  const running=new Set(S.sessions.map(s=>s.name));
+  const names=Object.keys(groups);
+  if(!names.length){ $('snapshots').innerHTML=`<div class="list"><div class="empty"><b>No snapshots yet</b>Save a session, or turn on auto-save in Settings.</div></div>`; return; }
+  $('snapshots').innerHTML=`<div class="list">${names.map(n=>{
+    const [latest,...older]=groups[n], open=openGroups.has(n), live=running.has(n);
+    const total=groups[n].reduce((a,s)=>a+s.size,0);
+    return `<div class="item">
+      <span class="dot ${live?'on':''}" title="${live?'Running now':'Not running'}"></span>
+      <div class="body">
+        <div class="row"><b>${esc(n)}</b>${live?'<span class="tag green">running</span>':''}
+          ${older.length?`<span class="more" onclick="toggleGroup(${arg(n)})">${open?'Hide':'Show'} ${plural(older.length,'older version')} (${size(total)})</span>`:''}</div>
+        <div class="meta">${snapLine(latest)}</div>
+      </div>
+      <div class="acts">
+        ${live?`<button onclick="restore(${arg(latest.file)},${arg(n)},true)">Restore as…</button>`
+              :`<button class="primary" onclick="restore(${arg(latest.file)},${arg(n)},false)">Restore</button>
+                <button class="ghost" title="Restore under a new name" onclick="restore(${arg(latest.file)},${arg(n)},true)">As…</button>`}
+        <button class="ghost danger" title="Delete this snapshot" onclick="delSnap(${arg(latest.file)})">Delete</button>
+      </div></div>
+      ${open?`<div class="older">${older.map(s=>`<div class="item"><div class="body meta" style="margin:0">${snapLine(s)}</div>
+        <div class="acts"><button class="ghost" onclick="restore(${arg(s.file)},${arg(n)},${live})">Restore${live?' as…':''}</button>
+        <button class="ghost danger" onclick="delSnap(${arg(s.file)})">Delete</button></div></div>`).join('')}</div>`:''}`;
+  }).join('')}</div>`;
+}
+
+// settings controls
+const sw=(k,label,hint='')=>`<div class="opt"><div class="l">${label}${hint?`<small>${hint}</small>`:''}</div>
+  <label class="sw"><input type="checkbox" ${S.settings[k]?'checked':''} onchange="setSetting('${k}',this.checked)"><i></i></label></div>`;
+const sel=(k,label,opts,hint='')=>`<div class="opt"><div class="l">${label}${hint?`<small>${hint}</small>`:''}</div>
+  <select onchange="setSetting('${k}',isNaN(+this.value)?this.value:+this.value)">${opts.map(([v,t])=>`<option value="${v}" ${S.settings[k]==v?'selected':''}>${t}</option>`).join('')}</select></div>`;
+const num=(k,label,unit,hint='')=>`<div class="opt"><div class="l">${label}${hint?`<small>${hint}</small>`:''}</div>
+  <div class="row"><input type="number" min="1" value="${S.settings[k]}" onchange="setSetting('${k}',+this.value)"><span class="meta" style="margin:0">${unit}</span></div></div>`;
+
+function renderSettings(){
+  $('settings').innerHTML=`
+  <div class="card sec"><h4>Auto-save</h4><p class="hint">Saves every session in the background, even when this app is closed.</p>
+    ${sw('autosave','Save sessions automatically')}
+    ${sel('interval_min','Save every',[[1,'1 minute'],[5,'5 minutes'],[15,'15 minutes'],[30,'30 minutes'],[60,'1 hour']])}
+    ${sel('keep_days','Keep auto-saves for',[[1,'1 day'],[3,'3 days'],[7,'1 week'],[14,'2 weeks'],[30,'1 month']],'All from the last hour, then one per hour, then one per day.')}
+  </div>
+  <div class="card sec"><h4>Terminal</h4><p class="hint">Where Attach opens a session.</p>
+    ${sel('terminal','Open sessions in',[['auto','Automatic'],['terminal','Terminal'],['iterm','iTerm'],['copy','Copy command (for Termius, Warp…)']],'Automatic uses iTerm if it is open, otherwise Terminal.')}
+    <div class="opt"><div class="l">Copilot command<small>Used to resume Copilot sessions, e.g. <code>copilot --yolo</code></small></div>
+      <input type="text" value="${esc(S.settings.copilot_cmd)}" onchange="setSetting('copilot_cmd',this.value)" style="width:200px"></div>
+  </div>
+  <div class="card sec"><h4>Restore</h4><p class="hint">What happens when you restore a snapshot.</p>
+    ${sw('restore_replay','Show previous output','Prints the saved screen back into each pane.')}
+    ${sw('restore_run','Run saved commands','Otherwise they are typed but not run, e.g. copilot --resume=…')}
+  </div>
+  <div class="card sec"><h4>Storage</h4><p class="hint">${esc(S.snap_dir)}</p>
+    <div class="row">${native?`<button onclick="native.postMessage({action:'folder'})">Open folder</button>`:''}
+    <button onclick="show('cleanup')">Clean up…</button></div>
+  </div>
+  ${native?`<div class="card sec"><h4>App</h4>
+    <div class="opt"><div class="l">Open at login<small>Keeps the menu-bar icon available after a restart.</small></div>
+      <label class="sw"><input type="checkbox" ${window.TM_NATIVE?.loginItem?'checked':''} onchange="native.postMessage({action:'login',on:this.checked});window.TM_NATIVE.loginItem=this.checked;toast('Saved')"><i></i></label></div>
+  </div>`:''}`;
+}
+
+async function renderCleanup(){
+  const st=S.settings;
+  $('cleanup').innerHTML=`
+  <div class="card sec"><h4>Rules</h4><p class="hint">Choose what to clean up. Changes are saved automatically.</p>
+    <div class="opt"><div class="l">Delete snapshots older than<small>Manual and auto snapshots.</small></div>
+      <div class="row"><input type="number" min="1" value="${st.cleanup_snapshot_days}" onchange="setSetting('cleanup_snapshot_days',+this.value)"><span class="meta" style="margin:0">days</span>
+      <label class="sw"><input type="checkbox" ${st.cleanup_snapshots?'checked':''} onchange="setSetting('cleanup_snapshots',this.checked)"><i></i></label></div></div>
+    ${sw('cleanup_keep_latest','Always keep the latest snapshot of each session')}
+    <div class="opt"><div class="l">Close sessions idle for more than<small>Detached sessions only. Saved first, so you can restore them.</small></div>
+      <div class="row"><input type="number" min="1" value="${st.cleanup_idle_days}" onchange="setSetting('cleanup_idle_days',+this.value)"><span class="meta" style="margin:0">days</span>
+      <label class="sw"><input type="checkbox" ${st.cleanup_idle?'checked':''} onchange="setSetting('cleanup_idle',this.checked)"><i></i></label></div></div>
+    <div class="opt"><div class="l">Delete Copilot sessions inactive for more than<small>Stopped sessions only. Moved to the Trash.</small></div>
+      <div class="row"><input type="number" min="1" value="${st.cleanup_copilot_days}" onchange="setSetting('cleanup_copilot_days',+this.value)"><span class="meta" style="margin:0">days</span>
+      <label class="sw"><input type="checkbox" ${st.cleanup_copilot?'checked':''} onchange="setSetting('cleanup_copilot',this.checked)"><i></i></label></div></div>
+    ${sw('cleanup_auto','Run automatically','After each auto-save.')}
+  </div>
+  <div class="card sec"><h4>Preview</h4><div id="plan" class="meta">Checking…</div></div>`;
+  try{
+    const p=await api('/api/cleanup',{apply:false});
+    const nothing=!p.delete.length&&!p.close.length&&!p.copilot.length;
+    $('plan').innerHTML = nothing ? `<div class="preview">Nothing to clean up. 🎉</div>` : `
+      <div class="preview">
+        ${p.delete.length?`<div><b>Delete ${plural(p.delete.length,'snapshot')}</b> · frees ${size(p.bytes)}</div>
+          <ul>${p.delete.slice(0,50).map(d=>`<li>${esc(d.session)} — ${ago(d.saved_at)}</li>`).join('')}${p.delete.length>50?`<li>…and ${p.delete.length-50} more</li>`:''}</ul>`:''}
+        ${p.copilot.length?`<div style="margin-top:8px"><b>Delete ${plural(p.copilot.length,'Copilot session')}</b> · frees ${size(p.copilot_bytes)}</div>
+          <ul>${p.copilot.slice(0,50).map(c=>`<li>${esc(c.title||'Untitled session')} — ${ago(c.last_active)}</li>`).join('')}${p.copilot.length>50?`<li>…and ${p.copilot.length-50} more</li>`:''}</ul>`:''}
+        ${p.close.length?`<div style="margin-top:8px"><b>Close ${plural(p.close.length,'session')}</b> · frees ${size(p.rss)} memory</div>
+          <ul>${p.close.map(c=>`<li>${esc(c.name)} — idle since ${ago(c.activity)}</li>`).join('')}</ul>`:''}
+      </div>
+      <div class="actions"><button class="dangerfill" onclick="doCleanup()">Clean up now</button></div>`;
+  }catch(e){ $('plan').textContent=e.message; }
+}
+async function doCleanup(){
+  if(!await modal({title:'Clean up now?', text:'This deletes and closes everything listed. Copilot sessions go to the Trash.', ok:'Clean up', danger:true})) return;
+  try{ const r=await api('/api/cleanup',{apply:true});
+    toast(`Deleted ${plural(r.delete.length,'snapshot')} and ${plural(r.copilot.length,'Copilot session')}, closed ${plural(r.close.length,'session')}`);
+  }catch(e){ toast(e.message,true); }
+  await refresh(); renderCleanup();
+}
+
+function show(t){
+  tab=t; for(const b of $('tabs').children) b.classList.toggle('on', b.dataset.t==t);
+  for(const id of ['sessions','copilot','snapshots','cleanup','settings']) $(id).hidden = id!=t;
+  if(t=='settings') renderSettings();
+  if(t=='cleanup') renderCleanup();
+  history.replaceState(null,'','#'+t);
+}
+$('tabs').onclick=e=>{ if(e.target.dataset.t) show(e.target.dataset.t); };
+
+async function refresh(){
+  try{ S=await api('/api/state'); }catch(e){ return; }
+  renderStats(); renderSessions(); renderCopilot(); renderSnapshots();
+  $('banner').innerHTML = S.tmux ? '' : `<div class="card" style="margin-top:12px;border-color:var(--danger)"><b>tmux is not installed.</b>
+    <div class="meta">Install it, then reopen this window: <code>brew install tmux</code></div></div>`;
+}
+refresh().then(()=>show(location.hash.slice(1)||'sessions'));
+setInterval(()=>{ if(!$('modal').classList.contains('show')) refresh(); }, 5000);
+window.addEventListener('hashchange',()=>{ const t=location.hash.slice(1); if(t&&t!=tab) show(t); });
+</script>
+</body>
+</html>

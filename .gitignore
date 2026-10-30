@@ -1,0 +1,10 @@
+# build output
+macapp/build/
+macapp/dist/
+# local data when running app.py from source
+snapshots/
+settings.json
+.last_autosave
+*.log
+__pycache__/
+.DS_Store
