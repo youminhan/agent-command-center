@@ -85,6 +85,14 @@ func freePort() -> Int {
     return Int(UInt16(bigEndian: addr.sin_port))
 }
 
+/// Invisible strip over the top of the window so it can still be dragged and
+/// double-clicked to zoom, since the web view fills the title bar area.
+final class DragStrip: NSView {
+    override func mouseDown(with event: NSEvent) {
+        if event.clickCount == 2 { window?.performZoom(nil) } else { window?.performDrag(with: event) }
+    }
+}
+
 class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, WKUIDelegate, WKScriptMessageHandler {
     var item: NSStatusItem!
     var server: Process?
@@ -376,19 +384,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, WKUIDelegate
             let wv = WKWebView(frame: .zero, configuration: cfg)
             wv.uiDelegate = self
             wv.setValue(false, forKey: "drawsBackground")
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1080, height: 760),
-                             styleMask: [.titled, .closable, .resizable, .miniaturizable],
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1180, height: 780),
+                             styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
                              backing: .buffered, defer: false)
             w.title = appName
+            w.titleVisibility = .hidden
             w.titlebarAppearsTransparent = true
-            w.backgroundColor = NSColor(name: nil) {
-                $0.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-                    ? NSColor(srgbRed: 0.05, green: 0.063, blue: 0.078, alpha: 1)
-                    : NSColor(srgbRed: 0.96, green: 0.965, blue: 0.973, alpha: 1)
-            }
             w.isReleasedWhenClosed = false
-            w.contentView = wv
-            w.minSize = NSSize(width: 640, height: 480)
+            // Translucent sidebar material shows through the page's transparent sidebar.
+            let blur = NSVisualEffectView()
+            blur.material = .sidebar
+            blur.blendingMode = .behindWindow
+            blur.state = .followsWindowActiveState
+            wv.autoresizingMask = [.width, .height]
+            if #available(macOS 12.0, *) { wv.underPageBackgroundColor = .clear }
+            blur.addSubview(wv)
+            let drag = DragStrip()
+            drag.autoresizingMask = [.width, .minYMargin]
+            blur.addSubview(drag)
+            w.contentView = blur
+            wv.frame = blur.bounds
+            drag.frame = NSRect(x: 0, y: blur.bounds.height - 28, width: blur.bounds.width, height: 28)
+            w.minSize = NSSize(width: 760, height: 520)
             w.center()
             w.setFrameAutosaveName("AgentCommandCenterWindow")
             window = w

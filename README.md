@@ -28,16 +28,24 @@
 
 ## Screenshots
 
-<p align="center"><img src="assets/tmux.png" alt="tmux sessions with memory use and the Copilot session running in each" width="900"></p>
+<p align="center"><img src="assets/overview.png" alt="Overview: metrics, memory by session, suggestions and recent Copilot sessions" width="900"></p>
 
 <table>
   <tr>
-    <td><img src="assets/copilot.png" alt="Copilot sessions with an expanded summary"></td>
+    <td><img src="assets/copilot.png" alt="A Copilot session's summary in the side panel"></td>
+    <td><img src="assets/tmux.png" alt="tmux sessions with memory bars"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Copilot: summary, next steps, PRs and files in a side panel</sub></td>
+    <td align="center"><sub>tmux sessions with memory use and the Copilot session inside</sub></td>
+  </tr>
+  <tr>
+    <td><img src="assets/palette.png" alt="Command palette"></td>
     <td><img src="assets/snapshots.png" alt="Snapshots grouped per session"></td>
   </tr>
   <tr>
-    <td align="center"><sub>Copilot: running and saved sessions, with summaries</sub></td>
-    <td align="center"><sub>Snapshots: one row per session, older versions underneath</sub></td>
+    <td align="center"><sub>⌘K command palette: jump to anything</sub></td>
+    <td align="center"><sub>Snapshots: one row per session, history underneath</sub></td>
   </tr>
   <tr>
     <td><img src="assets/cleanup.png" alt="Clean up rules with a preview"></td>
@@ -45,11 +53,11 @@
   </tr>
   <tr>
     <td align="center"><sub>Clean up: rules and a preview before anything is deleted</sub></td>
-    <td align="center"><sub>Settings: auto-save, terminal, restore</sub></td>
+    <td align="center"><sub>Settings: auto-save, terminal and restore</sub></td>
   </tr>
 </table>
 
-<sub>Screenshots use demo data.</sub>
+<sub>Screenshots use demo data. Regenerate them with <code>scripts/screenshots.sh</code>.</sub>
 
 ## Features
 
@@ -107,10 +115,19 @@ The app tells you if something is missing.
 
 | Where | What |
 |---|---|
-| **Dock / window** | The full app: tmux, Copilot, Snapshots, Clean up and Settings tabs. |
+| **Dock / window** | The full app: Overview, Sessions, Snapshots, Copilot, Clean up and Settings. |
 | **Menu bar** (▥ icon) | Running sessions, Save All, Restore, and Copilot memory at a glance. |
 | **Attach** | Opens the session in iTerm or Terminal. Using Termius, Warp or another terminal? Set **Settings → Terminal → Copy command** and paste it. |
 | **Copilot command** | Set **Settings → Copilot command** to how you start Copilot, for example `copilot --yolo`. |
+
+### Keyboard
+
+| Keys | Action |
+|---|---|
+| <kbd>⌘K</kbd> | Command palette: sessions, Copilot, snapshots and actions |
+| <kbd>⌘1</kbd>–<kbd>⌘6</kbd> | Switch pages |
+| <kbd>/</kbd> | Filter Copilot sessions |
+| <kbd>esc</kbd> | Close the panel, palette or dialog |
 
 ### Where things live
 
@@ -151,7 +168,8 @@ python3 app.py --save-all --force # take an auto-save now
 - `app.py` is a small, dependency-free Python server. It talks to `tmux`, reads Copilot's local
   session files, and serves a JSON API on `127.0.0.1` only. Write requests need a custom header,
   so other websites can't call it.
-- `ui.html` is the interface.
+- `ui.html` is the interface: a sidebar app with a command palette, light and dark mode, full keyboard
+  support and reduced-motion support.
 - `macapp/` is a native Swift wrapper: Dock app, menu-bar icon, window, terminal integration and the
   auto-save LaunchAgent. The app icon is drawn in code (`icon.swift`).
 

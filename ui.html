@@ -5,240 +5,376 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Agent Command Center</title>
 <style>
+/* Tokens are named for their role. Solid fills keep white text at 4.5:1 or better in both modes. */
 :root{
-  --bg:#f5f6f8;--panel:#fff;--panel2:#f0f2f5;--line:#e3e6eb;--text:#1b1f24;--muted:#6a737d;
-  --accent:#2ea043;--accent2:#238636;--accent-soft:#2ea04318;--danger:#d1242f;--danger-soft:#d1242f14;
-  --blue:#0969da;--blue-soft:#0969da14;--purple:#8250df;--purple-soft:#8250df16;--shadow:0 1px 2px #0000000d,0 4px 14px #0000000a;
+  --bg:#ffffff;--side:#f4f4f5;--side-line:#e4e4e7;--panel:#ffffff;--sub:#fafafa;--hover:#f4f4f5;--line:#e9e9ec;--line2:#d9d9de;
+  --text:#18181b;--text2:#3f3f46;--muted:#6b6b74;--faint:#a1a1aa;
+  --positive:#15803d;--positive-soft:#16a34a14;--positive-solid:#15803d;--positive-solid-hover:#166534;
+  --agent:#6d28d9;--agent-soft:#7c3aed12;--agent-solid:#6d28d9;
+  --info:#1d4ed8;--info-soft:#2563eb12;--warning:#b45309;--warning-soft:#d9770614;
+  --danger:#b91c1c;--danger-soft:#dc262612;--danger-solid:#b91c1c;
+  --on-solid:#ffffff;--nav-on:#ffffffb0;--scrim:#00000030;--ring:0 0 0 1px #18181b14;
+  --shadow-sm:0 0 0 1px #18181b12,0 1px 2px -1px #18181b14,0 2px 4px #18181b08;
+  --shadow:0 0 0 1px #18181b14,0 2px 4px #18181b0d,0 8px 24px #18181b12;
+  --shadow-lg:0 0 0 1px #18181b1a,0 24px 64px #18181b33;
+  --ease:cubic-bezier(.2,0,0,1);--mono:ui-monospace,"SF Mono",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#0d1014;--panel:#161b22;--panel2:#1c222b;--line:#2a313c;--text:#e6edf3;--muted:#8b949e;
-  --accent-soft:#2ea04326;--danger:#f85149;--danger-soft:#f8514920;--blue:#58a6ff;--blue-soft:#58a6ff1c;
-  --purple:#bc8cff;--purple-soft:#bc8cff1f;--shadow:0 1px 2px #0006,0 6px 20px #0004;
+  --bg:#0b0b0e;--side:#111114;--side-line:#1f1f24;--panel:#131317;--sub:#17171c;--hover:#1c1c22;--line:#222228;--line2:#30303a;
+  --text:#f4f4f5;--text2:#d4d4d8;--muted:#9a9aa4;--faint:#5c5c66;
+  --positive:#4ade80;--positive-soft:#22c55e1a;--positive-solid:#15803d;--positive-solid-hover:#166534;
+  --agent:#c4b5fd;--agent-soft:#a78bfa1f;--agent-solid:#6d28d9;
+  --info:#93c5fd;--info-soft:#60a5fa1a;--warning:#fcd34d;--warning-soft:#fbbf241a;
+  --danger:#fca5a5;--danger-soft:#f871711a;--danger-solid:#b91c1c;
+  --nav-on:#ffffff14;--scrim:#00000066;
+  --shadow-sm:0 0 0 1px #ffffff0f,0 1px 2px #00000080;
+  --shadow:0 0 0 1px #ffffff12,0 2px 4px #00000066,0 8px 24px #00000066;
+  --shadow-lg:0 0 0 1px #ffffff14,0 24px 64px #000000b3;
 }}
 *{box-sizing:border-box}
-body{margin:0;font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-.wrap{max-width:1040px;margin:0 auto;padding:22px 24px 60px}
-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:650;letter-spacing:-.2px}
-.brand svg{width:30px;height:30px}
+html,body{height:100%}
+body{margin:0;font:.84375rem/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;overflow:hidden}
+body.native{background:transparent}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+p,dd,li{text-wrap:pretty}
+:focus-visible{outline:2px solid var(--info);outline-offset:2px;border-radius:6px}
+svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);height:100dvh}
+
+/* sidebar */
+.side{background:var(--side);border-right:1px solid var(--side-line);display:flex;flex-direction:column;padding:14px 10px 12px;min-height:0}
+body.native .side{background:transparent;padding-top:44px}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 14px}
+.brand svg{width:28px;height:28px}
+.brand b{font-size:14px;letter-spacing:-.015em;display:block;line-height:1.2}
+.brand small{color:var(--muted);font-size:11.5px}
+.searchbtn{display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:0 9px;margin-bottom:12px;border:1px solid transparent;border-radius:8px;background:var(--panel);color:var(--muted);cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .15s}
+kbd{font:500 11px var(--mono);padding:1px 5px;border-radius:5px;border:1px solid var(--line2);background:var(--sub);color:var(--muted)}
+.searchbtn kbd{margin-left:auto}
+.navlabel{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:14px 10px 5px}
+.nav{display:flex;align-items:center;gap:9px;width:100%;min-height:30px;padding:0 10px;border:1px solid transparent;border-radius:7px;background:none;color:var(--text2);cursor:pointer;font-weight:500;text-align:start;transition:background-color .15s}
+.nav.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow-sm)}
+body.native .nav.on{background:var(--nav-on)}
+.nav .count{margin-left:auto;font-size:11.5px;color:var(--muted);font-weight:500}
+.nav .live{width:6px;height:6px;border-radius:50%;background:var(--positive);box-shadow:0 0 0 3px var(--positive-soft);margin-left:6px}
+.sidefoot{margin-top:auto;padding:12px 10px 2px;border-top:1px solid var(--side-line);display:flex;flex-direction:column;gap:10px}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--positive);position:relative;flex:none}
+.pulse.off{background:var(--faint)}
+.foot-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);background:none;border:0;padding:0;text-align:start;cursor:pointer}
+.foot-row.static{cursor:default;justify-content:space-between}
+.foot-row b{color:var(--text2);font-weight:550}
+.meter{height:6px;border-radius:6px;background:var(--line);display:flex;overflow:hidden}
+.meter i{display:block;height:100%}
+.legend{display:flex;gap:12px;font-size:11.5px;color:var(--muted)}
+.legend span:before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px;background:var(--c)}
+
+/* main */
+main{overflow:auto;background:var(--bg);min-width:0;scroll-padding-block-start:88px}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:22px 32px 16px;background:linear-gradient(var(--bg) 75%,transparent)}
+body.native .top{padding-top:30px}
+.top h1{margin:0;font-size:22px;font-weight:650;letter-spacing:-.022em;line-height:1.2;text-wrap:balance}
+.top p{margin:2px 0 0;color:var(--muted)}
 .spacer{flex:1}
-.stats{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:130px;box-shadow:var(--shadow)}
-.stat b{display:block;font-size:18px;font-weight:650;letter-spacing:-.3px}
-.stat span{color:var(--muted);font-size:12px}
-.stat.click{cursor:pointer}
-.group{display:flex;flex-direction:column;gap:6px}
-.group>label{font-size:11px;font-weight:650;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);padding-left:2px}
-.group>div{display:flex;gap:8px;flex-wrap:wrap}
-.stats{gap:22px!important}
-.detail{padding:4px 16px 16px 38px;background:var(--panel2);border-top:1px solid var(--line);font-size:13px}
-.detail h5{margin:12px 0 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-.detail p{margin:0;white-space:pre-wrap;word-break:break-word}
-.detail ul{margin:2px 0 0;padding-left:18px;color:var(--muted)}
-.item.click{cursor:pointer}.item.click:hover{background:var(--panel2)}
-select.wide{width:100%;margin-bottom:14px}.stat.click:hover{border-color:var(--accent)}
-nav{display:flex;gap:4px;margin:18px 0 16px;background:var(--panel2);padding:4px;border-radius:10px;width:max-content}
-nav button{border:0;background:none;color:var(--muted);padding:7px 16px;border-radius:7px;font-weight:550;box-shadow:none}
-nav button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
-button{font:inherit;font-size:13px;font-weight:550;cursor:pointer;border-radius:8px;padding:6px 12px;border:1px solid var(--line);background:var(--panel);color:var(--text);transition:.12s}
-button:hover{background:var(--panel2)}
-button:disabled{opacity:.45;cursor:default}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button.primary:hover{background:var(--accent2)}
-button.ghost{border-color:transparent;background:none;color:var(--muted)}
-button.ghost:hover{background:var(--panel2);color:var(--text)}
-button.danger{color:var(--danger)}button.danger:hover{background:var(--danger-soft)}
-button.dangerfill{background:var(--danger);border-color:var(--danger);color:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
-.card h3{margin:0;font-size:15px;font-weight:650;display:flex;align-items:center;gap:8px;min-width:0}
-.card h3 .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.top{display:flex;align-items:center;gap:8px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}.dot.on{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.meta{color:var(--muted);font-size:12.5px;margin-top:4px}
-.mem{font-variant-numeric:tabular-nums;font-size:12.5px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue-soft);color:var(--blue);white-space:nowrap}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{font-size:12px;padding:3px 9px;border-radius:20px;background:var(--purple-soft);color:var(--purple);cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip:hover{filter:brightness(1.15)}
-.tag{font-size:11px;font-weight:600;padding:1px 7px;border-radius:20px;background:var(--panel2);color:var(--muted)}
-.tag.green{background:var(--accent-soft);color:var(--accent)}
-.actions{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
-.list{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-.item{display:flex;align-items:center;gap:14px;padding:13px 16px;border-top:1px solid var(--line)}
-.item:first-child{border-top:0}
-.item .body{flex:1;min-width:0}
-.item .acts{display:flex;gap:4px;flex:none}
-.older{background:var(--panel2)}
-.older .item{padding:8px 16px 8px 34px;font-size:13px}
-.more{font-size:12px;color:var(--blue);cursor:pointer;margin-left:6px;font-weight:550}
-.empty{color:var(--muted);text-align:center;padding:40px 10px}
-.empty b{display:block;color:var(--text);font-size:15px;margin-bottom:4px}
-.sec{margin-bottom:14px}
-.sec h4{margin:0 0 2px;font-size:14px;font-weight:650}
-.sec p.hint{margin:0 0 12px;color:var(--muted);font-size:12.5px}
-.opt{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
-.opt:first-of-type{border-top:0}
+.view{padding:4px 32px 48px;max-width:1180px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border-radius:8px;border:1px solid transparent;background:var(--panel);color:var(--text);font-weight:550;font-size:13px;cursor:pointer;box-shadow:var(--shadow-sm);white-space:nowrap;transition-property:background-color,box-shadow,color,scale;transition-duration:.15s;transition-timing-function:ease-out}
+.btn svg.i{margin-inline-start:-2px}
+.btn.primary{background:var(--text);color:var(--bg)}
+.btn.positive{background:var(--positive-solid);color:var(--on-solid)}
+.btn.agent{background:var(--agent-solid);color:var(--on-solid)}
+.btn.ghost{background:none;box-shadow:none;color:var(--muted)}
+.btn.danger{color:var(--danger)}
+.btn.dangerfill{background:var(--danger-solid);color:var(--on-solid)}
+.btn.sm{min-height:26px;padding:0 9px;font-size:12.5px}
+.btn.icon{width:30px;padding:0;justify-content:center}.btn.sm.icon{width:26px}
+.btn.icon svg.i{margin:0}
+.btn:not(:disabled):active{scale:.96}
+
+/* cards & metrics */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.metric{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;width:100%;text-align:start;background:var(--panel);border:1px solid transparent;border-radius:12px;padding:14px 16px;box-shadow:var(--shadow-sm);transition:box-shadow .15s}
+button.metric{cursor:pointer}
+.metric:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--c,var(--line))}
+.metric .k{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12.5px;font-weight:500}
+.metric .k svg{color:var(--c)}
+.metric .v{display:block;font-size:26px;font-weight:650;letter-spacing:-.03em;margin-top:6px;line-height:1.1}
+.metric .s{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px}
+.panel{background:var(--panel);border:1px solid transparent;border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden}
+.panel>h3{display:flex;align-items:center;gap:8px;margin:0;padding:13px 16px;font-size:13px;font-weight:600;border-bottom:1px solid var(--line)}
+.panel>h3 .spacer{flex:1}
+.panel .pad{padding:14px 16px}
+.bars{display:flex;flex-direction:column;gap:4px;padding:10px 8px}
+.barrow{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 70px;align-items:center;gap:12px;font-size:12.5px;width:100%;padding:5px 8px;border:0;border-radius:6px;background:none;text-align:start;cursor:pointer;transition:background-color .15s}
+.barrow .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:8px;background:var(--c)}
+.barrow .val{text-align:end;color:var(--muted)}
+.suggest{display:flex;align-items:center;gap:12px;padding:12px 16px;border:0;border-top:1px solid var(--line);width:100%;background:none;text-align:start}
+.suggest:first-child{border-top:0}
+button.suggest{cursor:pointer;transition:background-color .15s}
+.suggest .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--c-soft);color:var(--c);flex:none}
+.suggest .t{flex:1;min-width:0}.suggest .t b{font-weight:550;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.suggest .t span{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* lists */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.seg{display:inline-flex;padding:3px;border-radius:9px;background:var(--hover);gap:2px}
+.seg button{border:0;background:none;min-height:26px;padding:0 12px;border-radius:6px;font-weight:550;font-size:12.5px;color:var(--muted);cursor:pointer;transition:background-color .15s,color .15s}
+.seg button[aria-pressed=true]{background:var(--panel);color:var(--text);box-shadow:var(--shadow-sm)}
+.seg button span{margin-left:4px;font-weight:500}
+.input{display:flex;align-items:center;gap:7px;min-height:30px;padding:0 10px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);color:var(--muted)}
+.input input{border:0;outline:0;background:none;color:var(--text);font:inherit;width:220px}
+.input:focus-within{border-color:var(--info);box-shadow:0 0 0 3px var(--info-soft)}
+.list{background:var(--panel);border:1px solid transparent;border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden}
+.row{display:grid;grid-template-columns:18px minmax(0,1fr) 170px auto;align-items:center;gap:14px;padding:11px 14px;border-top:1px solid var(--line);transition:background-color .1s}
+.row:first-child{border-top:0}
+.row.click{cursor:pointer}
+.row .title{display:flex;align-items:center;gap:8px;min-width:0;font-weight:550}
+.row .title .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;background:none;padding:0;font-weight:550;text-align:start;cursor:inherit}
+.row .meta{color:var(--muted);font-size:12.5px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .acts{display:flex;gap:4px;align-items:center;justify-content:flex-end}
+.row .acts .hov{opacity:0;transition:opacity .12s}
+.row:focus-within .acts .hov{opacity:1}
+@media (hover:none){.row .acts .hov{opacity:1}}
+.memcell{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.memcell .bar{flex:1;height:6px}
+.memcell span{width:58px;text-align:end}
+.status{width:8px;height:8px;border-radius:50%;background:var(--faint);justify-self:center}
+.status.on{background:var(--positive);box-shadow:0 0 0 3px var(--positive-soft)}
+.status.cp{background:var(--agent);box-shadow:0 0 0 3px var(--agent-soft)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:550;padding:1px 7px;border:0;border-radius:6px;background:var(--hover);color:var(--muted);white-space:nowrap}
+button.badge{cursor:pointer}
+.badge.positive{background:var(--positive-soft);color:var(--positive)}
+.badge.agent{background:var(--agent-soft);color:var(--agent)}
+.badge.warning{background:var(--warning-soft);color:var(--warning)}
+.badge svg{width:12px;height:12px}
+.sub-rows{background:var(--sub);border-top:1px solid var(--line)}
+.tl{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:14px;align-items:center;padding:7px 14px;position:relative;font-size:12.5px;color:var(--muted)}
+.tl:before{content:"";position:absolute;left:22px;top:0;bottom:0;width:1px;background:var(--line2)}
+.tl .dot{width:7px;height:7px;border-radius:50%;background:var(--panel);border:1.5px solid var(--faint);justify-self:center;z-index:1}
+.linkish{color:var(--info);cursor:pointer;font-weight:500;font-size:12.5px;border:0;background:none;padding:0;text-underline-offset:2px}
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty .ic{width:44px;height:44px;border-radius:12px;margin:0 auto 12px;display:grid;place-items:center;background:var(--hover);color:var(--muted)}
+.empty .ic svg{width:22px;height:22px}
+.empty b{display:block;color:var(--text);font-size:14px;margin-bottom:3px}
+.more{display:flex;justify-content:center;padding:10px}
+.skeleton{height:52px;border-top:1px solid var(--line);background:linear-gradient(90deg,transparent,var(--hover),transparent);background-size:200% 100%}
+
+/* grouped settings */
+.group{margin-bottom:22px}
+.group>h4{margin:0 0 2px;font-size:13px;font-weight:600}
+.group>p{margin:0 0 9px;color:var(--muted);font-size:12.5px}
+.opt{display:flex;align-items:center;gap:14px;padding:11px 16px;border-top:1px solid var(--line)}
+.opt:first-child{border-top:0}
 .opt .l{flex:1}.opt .l small{display:block;color:var(--muted);font-size:12px}
-select,input[type=number],input[type=text]{font:inherit;font-size:13px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text)}
-input[type=number]{width:70px}
-.sw{position:relative;width:38px;height:22px;flex:none}
-.sw input{opacity:0;width:0;height:0}
-.sw i{position:absolute;inset:0;border-radius:22px;background:var(--line);transition:.15s;cursor:pointer}
-.sw i:before{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:.15s}
-.sw input:checked+i{background:var(--accent)}.sw input:checked+i:before{transform:translateX(16px)}
-.preview{border-radius:12px;padding:14px 16px;background:var(--panel2);margin-top:4px}
-.preview ul{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12.5px;max-height:180px;overflow:auto}
-.row{display:flex;gap:10px;align-items:center}
-#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:550;transition:.2s;pointer-events:none;box-shadow:var(--shadow);max-width:80vw}
-#toast.show{opacity:1;transform:translateX(-50%)}#toast.err{background:var(--danger);color:#fff}
-.modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
-.modal.show{display:flex}
-.dialog{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;width:360px;box-shadow:0 20px 50px #0005}
-.dialog h3{margin:0 0 6px;font-size:15px}.dialog p{margin:0 0 14px;color:var(--muted);font-size:13px}
-.dialog input{width:100%;margin-bottom:14px}
-.dialog .row{justify-content:flex-end}
+select,.opt input[type=number],.opt input[type=text]{font:inherit;font-size:13px;min-height:28px;padding:0 9px;border-radius:7px;border:1px solid var(--line2);background:var(--panel);color:var(--text)}
+.opt input[type=number]{width:64px}
+.sw{position:relative;width:34px;height:20px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:1}
+.sw i{position:absolute;inset:0;border-radius:20px;background:var(--line2);transition:background-color .15s}
+.sw i:before{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0004;transition:translate .15s ease-out}
+.sw input:checked+i{background:var(--positive-solid)}.sw input:checked+i:before{translate:14px 0}
+.sw input:focus-visible+i{outline:2px solid var(--info);outline-offset:2px}
+.inline{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.plan{padding:14px 16px}
+.plan .line{display:flex;align-items:center;gap:10px;padding:8px 0}
+.plan ul{margin:0 0 6px 34px;padding:0;color:var(--muted);font-size:12.5px;max-height:160px;overflow:auto;overscroll-behavior:contain}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:transparent;pointer-events:none;transition:background-color .2s;z-index:20}
+.scrim.show{background:var(--scrim);pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,92vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);visibility:hidden;opacity:0;z-index:21;display:flex;flex-direction:column;transition:opacity .2s var(--ease),visibility 0s .2s}
+.drawer.show{visibility:visible;opacity:1;transition:opacity .2s var(--ease)}
+.drawer header{padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+body.native .drawer header{padding-top:34px}
+.drawer header h2{margin:0;font-size:17px;letter-spacing:-.015em;line-height:1.3;padding-inline-end:30px;text-wrap:balance}
+.drawer header .meta{color:var(--muted);font-size:12.5px;margin-top:4px}
+.drawer header .acts{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.drawer .x{position:absolute;right:14px;top:14px}
+body.native .drawer .x{top:30px}
+.drawer .body{padding:6px 20px 24px;overflow:auto;overscroll-behavior:contain}
+.drawer h3{margin:18px 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.drawer p{margin:0;white-space:pre-wrap;word-break:break-word;color:var(--text2)}
+.drawer .quote{border-left:2px solid var(--line2);padding-left:10px;color:var(--muted)}
+.drawer ul{margin:0;padding-left:18px;color:var(--text2)}
+.drawer li{margin:2px 0}
+.facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;font-size:12.5px;margin:0}
+.facts dt{color:var(--muted)}.facts dd{margin:0;word-break:break-all}
+code{font:12px var(--mono);background:var(--hover);padding:1px 5px;border-radius:5px}
+
+/* palette */
+.pal{position:fixed;inset:0;z-index:40;display:none;align-items:flex-start;justify-content:center;padding-top:14vh;background:var(--scrim)}
+.pal.show{display:flex}
+.palbox{width:min(620px,92vw);background:var(--panel);border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden}
+.palbox .in{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);color:var(--muted)}
+.palbox input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:15px;color:var(--text)}
+.palres{max-height:52vh;overflow:auto;overscroll-behavior:contain;padding:6px}
+.palsec{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 4px}
+.palitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2)}
+.palitem .h{margin-left:auto;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.palitem[aria-selected=true]{background:var(--hover);color:var(--text)}
+.palfoot{display:flex;gap:14px;padding:8px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px}
+
+/* modal + toast */
+.modal{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;z-index:50;visibility:hidden;opacity:0;transition:opacity .15s ease-out,visibility 0s .15s}
+.modal.show{visibility:visible;opacity:1;transition:opacity .15s ease-out}
+.dialog{background:var(--panel);border-radius:14px;padding:20px;width:380px;box-shadow:var(--shadow-lg)}
+.dialog h2{margin:0 0 6px;font-size:15px}
+.dialog p{margin:0 0 14px;color:var(--muted);font-size:13px}
+.dialog input,.dialog select{width:100%;min-height:32px;margin-bottom:14px;font:inherit;padding:0 10px;border-radius:8px;border:1px solid var(--line2);background:var(--sub);color:var(--text)}
+.dialog .bt{display:flex;justify-content:flex-end;gap:8px}
+.toasts{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:8px;z-index:60}
+.toast{display:flex;align-items:center;gap:9px;background:var(--panel);color:var(--text);padding:10px 14px;border-radius:10px;box-shadow:var(--shadow);font-weight:500;max-width:420px;transition:opacity .15s ease-out}
+.toast svg{color:var(--positive)}.toast.err svg{color:var(--danger)}
+.banner{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--warning);background:var(--warning-soft);border-radius:10px;margin-bottom:14px}
+
+/* hover only where a pointer can hover */
+@media (hover:hover){
+  .searchbtn:hover{box-shadow:var(--shadow)}
+  .nav:not(.on):hover{background:var(--hover)}
+  .btn:hover{background:var(--hover)}
+  .btn.primary:hover{background:var(--text2)}
+  .btn.positive:hover{background:var(--positive-solid-hover)}
+  .btn.ghost:hover{background:var(--hover);color:var(--text)}
+  .btn.danger:hover{background:var(--danger-soft)}
+  button.metric:hover{box-shadow:var(--shadow)}
+  .barrow:hover,button.suggest:hover{background:var(--sub)}
+  .row:hover{background:var(--sub)}
+  .row:hover .acts .hov{opacity:1}
+  .linkish:hover{text-decoration:underline}
+}
+
+/* movement only when the user has not asked for reduced motion */
+@media (prefers-reduced-motion:no-preference){
+  .pulse:after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--positive);opacity:.5;animation:pulse 2s infinite}
+  .pulse.off:after{display:none}
+  .skeleton{animation:sk 1.2s infinite}
+  .drawer{translate:24px 0;transition:opacity .2s var(--ease),translate .24s var(--ease),visibility 0s .24s}
+  .drawer.show{translate:0 0;transition:opacity .2s var(--ease),translate .24s var(--ease)}
+  .dialog{scale:.96;transition:scale .15s ease-out}
+  .modal.show .dialog{scale:1}
+  .toast{animation:enter .3s ease-out both}
+}
+@keyframes pulse{0%{transform:scale(.6);opacity:.6}100%{transform:scale(1.6);opacity:0}}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes enter{from{opacity:0;translate:0 12px;filter:blur(4px)}}
+@media (max-width:900px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:18px minmax(0,1fr) auto}.row .memcell{display:none}}
+@media (max-width:640px){input,select{font-size:16px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
+<div class="app">
+  <aside class="side">
     <div class="brand">
-      <svg viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="22" fill="#1b2029"/><rect x="12" y="14" width="40" height="56" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="3"/><rect x="57" y="14" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><path d="M72.5 17Q74 25 81 26.5Q74 28 72.5 36Q71 28 64 26.5Q71 25 72.5 17Z" fill="#bc8cff"/><rect x="57" y="45" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><rect x="62" y="52" width="18" height="3" rx="1.5" fill="#8b949e88"/><rect x="62" y="59" width="12" height="3" rx="1.5" fill="#8b949e88"/><path d="M19 27l8 6-8 6" stroke="#3fb950" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="31" y="37" width="10" height="3" rx="1.5" fill="#e6edf3"/><rect x="12" y="76" width="76" height="11" rx="4" fill="#2ea043"/></svg>
-      <div>Agent Command Center<div class="meta" style="margin:0;font-weight:400">tmux + Copilot sessions</div></div>
+      <svg viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="24" fill="#1b2029"/><rect x="12" y="14" width="40" height="56" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="3"/><rect x="57" y="14" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><path d="M72.5 17Q74 25 81 26.5Q74 28 72.5 36Q71 28 64 26.5Q71 25 72.5 17Z" fill="#bc8cff"/><rect x="57" y="45" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><path d="M19 27l8 6-8 6" stroke="#3fb950" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="31" y="37" width="10" height="3" rx="1.5" fill="#e6edf3"/><rect x="12" y="76" width="76" height="11" rx="4" fill="#2ea043"/></svg>
+      <div><b>Agent Command Center</b><small>tmux + Copilot</small></div>
     </div>
-    <div class="spacer"></div>
-    <button onclick="saveAll()">Save all</button>
-    <button class="primary" onclick="newSession()">+ New session</button>
-  </header>
-
-  <div class="stats" id="stats"></div>
-  <div id="banner"></div>
-
-  <nav id="tabs">
-    <button data-t="sessions" class="on">tmux</button>
-    <button data-t="copilot">Copilot</button>
-    <button data-t="snapshots">Snapshots</button>
-    <button data-t="cleanup">Clean up</button>
-    <button data-t="settings">Settings</button>
-  </nav>
-
-  <section id="sessions"></section>
-  <section id="copilot" hidden></section>
-  <section id="snapshots" hidden></section>
-  <section id="cleanup" hidden></section>
-  <section id="settings" hidden></section>
+    <button class="searchbtn" onclick="openPalette()" aria-keyshortcuts="Meta+K"><svg class="i"><use href="#i-search"/></svg>Search or run…<kbd>⌘K</kbd></button>
+    <nav id="nav" aria-label="Pages"></nav>
+    <div class="sidefoot" id="sidefoot"></div>
+  </aside>
+  <main id="main">
+    <div class="top"><div><h1 id="title"></h1><p id="subtitle"></p></div><div class="spacer"></div><div id="topacts" class="inline"></div></div>
+    <div class="view"><div id="banner"></div><div id="view"></div></div>
+  </main>
 </div>
 
-<div id="toast"></div>
-<div class="modal" id="modal"><div class="dialog">
-  <h3 id="mTitle"></h3><p id="mText"></p><input id="mInput" type="text" hidden><select id="mSelect" class="wide" hidden></select>
-  <div class="row"><button class="ghost" id="mCancel">Cancel</button><button class="primary" id="mOk">OK</button></div>
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle"></aside>
+
+<div class="pal" id="pal" onclick="if(event.target==this)closePalette()">
+  <div class="palbox" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="in"><svg class="i"><use href="#i-search"/></svg><input id="palq" placeholder="Search sessions, Copilot, actions…" autocomplete="off" role="combobox" aria-controls="palres" aria-expanded="true" aria-label="Search sessions, Copilot and actions"><kbd>esc</kbd></div>
+    <div class="palres" id="palres" role="listbox" aria-label="Results"></div>
+    <div class="palfoot"><span><kbd>↑</kbd> <kbd>↓</kbd> move</span><span><kbd>↵</kbd> run</span><span><kbd>⌘1–6</kbd> pages</span></div>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-describedby="mText">
+  <h2 id="mTitle"></h2><p id="mText"></p><input id="mInput" type="text" hidden><select id="mSelect" hidden></select>
+  <div class="bt"><button class="btn ghost" id="mCancel">Cancel</button><button class="btn primary" id="mOk">OK</button></div>
 </div></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></symbol>
+  <symbol id="i-term" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 9l3 3-3 3M13 15h4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7z"/><path d="M19 3v3M17.5 4.5h3"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+  <symbol id="i-broom" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+  <symbol id="i-in" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 8v5M12 16.5v.5"/><path d="M10.3 3.9L2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  <symbol id="i-disk" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="i-move" viewBox="0 0 24 24"><path d="M4 12h13M13 7l5 5-5 5"/><path d="M21 4v16"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+</svg>
 
 <script>
+// ===================================================================== helpers
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const arg = s => esc(JSON.stringify(s));
+const ic = (n, cls='i') => `<svg class="${cls}"><use href="#i-${n}"/></svg>`;
 const native = window.webkit?.messageHandlers?.tm;
-let S = null, tab = 'sessions';
-const openGroups = new Set();
+if (native) document.body.classList.add('native');
+let S = null, page = 'overview', planCache = null, planAt = 0;
 
-// ---------- formatting
-function size(b){ if(!b) return '0 B'; const u=['B','KB','MB','GB']; let i=0; while(b>=1024&&i<3){b/=1024;i++} return (b>=100||i==0?Math.round(b):b.toFixed(1))+' '+u[i]; }
+function size(b){ if(!b) return '0 B'; const u=['B','KB','MB','GB','TB']; let i=0; while(b>=1024&&i<4){b/=1024;i++} return (b>=100||i==0?Math.round(b):b.toFixed(1))+' '+u[i]; }
 function ago(t){ const s=Math.max(0,Date.now()/1000-t); if(s<60) return 'just now'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
 const plural = (n,w) => `${n} ${w}${n==1?'':'s'}`;
+const home = p => esc((p||'').replace(/^\/(Users|home)\/[^/]+/,'~'));
+const cpTitle = c => c.title || 'Untitled session';
+const shq = s => "'"+String(s).replace(/'/g,"'\\''")+"'";
 
-// ---------- api / ui helpers
 async function api(path, body){
   const r = await fetch(path, {method: body?'POST':'GET', headers:{'Content-Type':'application/json','X-Tmux-Manager':'1'}, body: body?JSON.stringify(body):undefined});
   const j = await r.json(); if(!r.ok) throw new Error(j.error || r.statusText); return j;
 }
-let toastT;
-function toast(t, err){ const e=$('toast'); e.textContent=t; e.className='show'+(err?' err':''); clearTimeout(toastT); toastT=setTimeout(()=>e.className='',2600); }
+function toast(t, err){
+  const e=document.createElement('div'); e.className='toast'+(err?' err':''); e.innerHTML=ic(err?'alert':'check')+`<span>${esc(t)}</span>`;
+  $('toasts').append(e); setTimeout(()=>{ e.style.opacity=0; setTimeout(()=>e.remove(),260); }, 2800);
+}
 async function run(fn){ try{ const r=await fn(); if(r?.message) toast(r.message); return r; }catch(e){ toast(e.message,true); } finally{ refresh(); } }
 function modal({title, text='', input=null, choices=null, ok='OK', danger=false}){
   return new Promise(res=>{
     $('mTitle').textContent=title; $('mText').textContent=text; $('mText').hidden=!text;
-    const inp=$('mInput'); inp.hidden=input===null; inp.value=input??'';
-    const sel=$('mSelect'); sel.hidden=!choices;
+    const inp=$('mInput'), sel=$('mSelect');
+    inp.hidden=input===null; inp.value=input??''; sel.hidden=!choices;
     if(choices) sel.innerHTML=choices.map(([v,t])=>`<option value="${esc(v)}">${esc(t)}</option>`).join('');
-    $('mOk').textContent=ok; $('mOk').className=danger?'dangerfill':'primary';
-    $('modal').classList.add('show'); (input!==null?inp:$('mOk')).focus();
-    const done=v=>{ $('modal').classList.remove('show'); $('mOk').onclick=$('mCancel').onclick=inp.onkeydown=null; res(v); };
+    $('mOk').textContent=ok; $('mOk').className='btn '+(danger?'dangerfill':'primary');
+    const prev=document.activeElement;
+    $('modal').classList.add('show'); (input!==null?inp:choices?sel:$('mOk')).focus();
+    const done=v=>{ $('modal').classList.remove('show'); prev?.focus?.(); $('mOk').onclick=$('mCancel').onclick=inp.onkeydown=null; res(v); };
     $('mOk').onclick=()=>done(choices?sel.value:input!==null?inp.value.trim():true);
     $('mCancel').onclick=()=>done(choices||input!==null?null:false);
-    inp.onkeydown=e=>{ if(e.key=='Enter') $('mOk').click(); if(e.key=='Escape') $('mCancel').click(); };
+    inp.onkeydown=e=>{ if(e.key=='Enter') $('mOk').click(); };
   });
 }
-document.addEventListener('keydown',e=>{ if(e.key=='Escape'&&$('modal').classList.contains('show')) $('mCancel').click(); });
+const modalOpen = () => $('modal').classList.contains('show');
 
-// ---------- actions
-function attach(name){
-  const cmd=`tmux attach -t '=${name}'`, term=S?.settings.terminal||'auto';
-  if(native && term!='copy') native.postMessage({action:'terminal', command:cmd, app:term});
-  else { copy(cmd); }
-}
-function copy(t){
-  if(native) native.postMessage({action:'copy', text:t}); else navigator.clipboard?.writeText(t);
-  toast('Copied: '+t);
-}
-function copyResume(id){ copy(`${S.settings.copilot_cmd} --resume=${id}`); }
-const cpTitle = c => c.title || 'Untitled session';
-async function cpStop(id,title){ if(await modal({title:`Stop “${title}”?`, text:'Ends the Copilot process to free memory. You can resume it later.', ok:'Stop', danger:true})) run(()=>api('/api/copilot/stop',{id})); }
-// Ask where to run a Copilot session in tmux: a new session or a window in an existing one.
-async function pickTmux(title, ok){
-  const choices=[['', 'New tmux session'], ...S.sessions.map(s=>[s.name, `New window in “${s.name}”`])];
-  return modal({title, text:'Choose where it should run.', choices, ok});
-}
-async function cpResumeTmux(id,title){
-  const target=await pickTmux(`Resume “${title}” in tmux`, 'Resume'); if(target===null) return;
-  const r=await run(()=>api('/api/copilot/resume',{id, target:target||null})); if(r?.name) attach(r.name);
-}
-async function cpMove(id,title,app){
-  const target=await pickTmux(`Move “${title}” to tmux`, 'Move'); if(target===null) return;
-  if(!await modal({title:'Move it now?', text:`This ends it in ${app||'its terminal'} and resumes it in tmux, so it keeps running after you close that window.`, ok:'Move'})) return;
-  const r=await run(()=>api('/api/copilot/move',{id, target:target||null})); if(r?.name) attach(r.name);
-}
-const shq = s => "'"+String(s).replace(/'/g,"'\\''")+"'";
-function cpResume(c){
-  const cmd=`${c.cwd?`cd ${shq(c.cwd)} && `:''}${S.settings.copilot_cmd} --resume=${c.id}`, term=S.settings.terminal;
+// ===================================================================== actions
+function copy(t){ if(native) native.postMessage({action:'copy', text:t}); else navigator.clipboard?.writeText(t); toast('Copied: '+t); }
+function inTerminal(cmd){
+  const term=S?.settings.terminal||'auto';
   if(native && term!='copy') native.postMessage({action:'terminal', command:cmd, app:term}); else copy(cmd);
 }
-async function cpDelete(id,title,sz){
-  if(!await modal({title:`Delete “${title}”?`, text:`Moves its saved state (${size(sz)}) to the Trash. It can no longer be resumed unless you put it back.`, ok:'Delete', danger:true})) return;
-  openCp.delete(id); run(()=>api('/api/copilot/delete',{id}));
-}
-const openCp=new Set(), cpDetails={};
-async function cpToggle(id){
-  if(openCp.has(id)){ openCp.delete(id); renderCopilot(); return; }
-  openCp.add(id); renderCopilot();
-  try{ cpDetails[id]=await api('/api/copilot/detail',{id}); }catch(e){ cpDetails[id]={error:e.message}; }
-  renderCopilot();
-}
-function cpDetailHtml(id){
-  const d=cpDetails[id];
-  if(!d) return `<div class="detail"><p class="meta">Loading…</p></div>`;
-  if(d.error) return `<div class="detail"><p class="meta">${esc(d.error)}</p></div>`;
-  const sec=(h,body)=>body?`<h5>${h}</h5>${body}`:'';
-  const summary = d.overview || (d.first_ask ? `Started with: ${d.first_ask}` : '');
-  const facts=[d.turns?plural(d.turns,'request'):'', d.file_count?plural(d.file_count,'file')+' touched':'',
-    d.repository?esc(d.repository)+(d.branch?' @ '+esc(d.branch):''):'', d.model?esc(d.model):'', size(d.size)+' on disk'].filter(Boolean).join(' · ');
-  return `<div class="detail">
-    ${sec('Summary', summary?`<p>${esc(summary)}</p>`:'<p class="meta">No summary recorded yet.</p>')}
-    ${sec('Next steps', d.next_steps&&`<p>${esc(d.next_steps)}</p>`)}
-    ${sec('Last request', d.last_ask&&d.last_ask!==d.first_ask&&`<p>${esc(d.last_ask)}</p>`)}
-    ${sec('Last reply', d.last_reply&&`<p class="meta">${esc(d.last_reply)}</p>`)}
-    ${sec('Checkpoints', d.checkpoints.length&&`<ul>${d.checkpoints.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`)}
-    ${sec('PRs & commits', d.refs.length&&`<ul>${d.refs.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`)}
-    ${sec('Recent files', d.files.length&&`<ul>${d.files.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`)}
-    <h5>Details</h5><p class="meta">${facts} · <span class="more" style="margin:0" onclick="copy(${arg(d.id)})">${esc(d.id)}</span></p>
-  </div>`;
-}
-let cpFilter='', cpShow=15;
+const attach = name => inTerminal(`tmux attach -t '=${name}'`);
 async function newSession(){
-  const name=await modal({title:'New session', text:'Letters, numbers, dot, dash or underscore.', input:'', ok:'Create'});
-  if(!name) return;
-  const r=await run(()=>api('/api/new',{name})); if(r) attach(name);
+  const name=await modal({title:'New tmux session', text:'Letters, numbers, dot, dash or underscore.', input:'', ok:'Create'});
+  if(!name) return; const r=await run(()=>api('/api/new',{name})); if(r) attach(name);
 }
 const save = name => run(()=>api('/api/save',{name}));
 const saveAll = () => run(()=>api('/api/saveall',{}));
@@ -247,216 +383,422 @@ async function killSess(name){ if(await modal({title:`Kill ${name}?`, text:'Ends
 async function restore(file, session, rename){
   let name=null;
   if(rename){ name=await modal({title:'Restore as…', text:`New name for a copy of ${session}.`, input:session+'-2', ok:'Restore'}); if(!name) return; }
-  const r=await run(()=>api('/api/restore',{file, name}));
-  if(r?.name && native) attach(r.name);
+  const r=await run(()=>api('/api/restore',{file, name})); if(r?.name && native) attach(r.name);
 }
 async function delSnap(file){ if(await modal({title:'Delete snapshot?', ok:'Delete', danger:true})) run(()=>api('/api/delete',{file})); }
-function toggleGroup(n){ openGroups.has(n)?openGroups.delete(n):openGroups.add(n); renderSnapshots(); }
-async function setSetting(k, v){ try{ const r=await api('/api/settings',{[k]:v}); S.settings=r.settings; toast('Saved'); renderStats(); if(tab=='cleanup') renderCleanup(); }catch(e){ toast(e.message,true); } }
+async function setSetting(k, v){ try{ const r=await api('/api/settings',{[k]:v}); S.settings=r.settings; toast('Saved'); planAt=0; renderChrome(); if(page=='cleanup') renderCleanup(); }catch(e){ toast(e.message,true); } }
 
-// ---------- render
-function renderStats(){
-  const ss=S.sessions, run=S.copilot.running, cps=run.length;
-  const disk=S.snapshots.reduce((a,s)=>a+s.size,0), st=S.settings;
-  const auto = st.autosave ? (S.last_autosave ? ago(S.last_autosave) : 'pending') : 'off';
-  const tmem=ss.reduce((a,s)=>a+s.rss,0), cmem=run.reduce((a,c)=>a+c.rss,0);
-  $('stats').innerHTML=`
-    <div class="group"><label>tmux</label><div>
-      <div class="stat click" onclick="show('sessions')"><b>${ss.length}</b><span>${ss.length==1?'session':'sessions'} running</span></div>
-      <div class="stat"><b>${size(tmem)}</b><span>memory</span></div>
-      <div class="stat click" onclick="show('snapshots')"><b>${S.snapshots.length}</b><span>snapshots · ${size(disk)}</span></div>
-      <div class="stat click" onclick="show('settings')"><b>${auto}</b><span>auto-save${st.autosave?` · every ${st.interval_min}m`:''}</span></div>
-    </div></div>
-    <div class="group"><label>Copilot</label><div>
-      <div class="stat click" onclick="show('copilot')"><b>${cps}</b><span>running</span></div>
-      <div class="stat"><b>${size(cmem)}</b><span>memory</span></div>
-      <div class="stat click" onclick="show('copilot')"><b>${S.copilot.total}</b><span>saved · ${size(S.copilot.total_size)}</span></div>
-    </div></div>`;
+const copyResume = id => copy(`${S.settings.copilot_cmd} --resume=${id}`);
+function cpResume(c){ inTerminal(`${c.cwd?`cd ${shq(c.cwd)} && `:''}${S.settings.copilot_cmd} --resume=${c.id}`); }
+async function pickTmux(title, ok){
+  const choices=[['', 'New tmux session'], ...S.sessions.map(s=>[s.name, `New window in “${s.name}”`])];
+  return modal({title, text:'Choose where it should run.', choices, ok});
+}
+async function cpResumeTmux(id,title){
+  const target=await pickTmux(`Resume “${title}” in tmux`, 'Resume'); if(target===null) return;
+  const r=await run(()=>api('/api/copilot/resume',{id, target:target||null})); if(r?.name){ closeDrawer(); attach(r.name); }
+}
+async function cpMove(id,title,app){
+  const target=await pickTmux(`Move “${title}” to tmux`, 'Continue'); if(target===null) return;
+  if(!await modal({title:'Move it now?', text:`This ends it in ${app||'its terminal'} and resumes it in tmux, so it keeps running after you close that window.`, ok:'Move'})) return;
+  const r=await run(()=>api('/api/copilot/move',{id, target:target||null})); if(r?.name){ closeDrawer(); attach(r.name); }
+}
+async function cpStop(id,title){ if(await modal({title:`Stop “${title}”?`, text:'Ends the Copilot process to free memory. You can resume it later.', ok:'Stop', danger:true})){ closeDrawer(); run(()=>api('/api/copilot/stop',{id})); } }
+async function cpDelete(id,title,sz){
+  if(!await modal({title:`Delete “${title}”?`, text:`Moves its saved state (${size(sz)}) to the Trash. It can't be resumed unless you put it back.`, ok:'Delete', danger:true})) return;
+  closeDrawer(); run(()=>api('/api/copilot/delete',{id}));
 }
 
-function copilotChips(list){
-  if(!list.length) return '';
-  return `<div class="chips">${list.map(c=>`<span class="chip" title="Click to copy the resume command" onclick="copyResume(${arg(c.id)})">✦ ${esc(cpTitle(c))}${c.rss?` · ${size(c.rss)}`:''}</span>`).join('')}</div>`;
+// ===================================================================== chrome
+const PAGES = [
+  ['overview','home','Overview','Everything at a glance'],
+  ['sessions','term','Sessions','tmux sessions on this Mac'],
+  ['snapshots','history','Snapshots','Saved tmux layouts you can restore'],
+  ['copilot','spark','Copilot','Copilot CLI sessions, running and saved'],
+  ['cleanup','broom','Clean up','Free memory and disk'],
+  ['settings','gear','Settings','Auto-save, terminal and restore'],
+];
+function navItem(id){
+  const [, icn, label] = PAGES.find(p=>p[0]==id); let count='';
+  if(S){
+    if(id=='sessions') count=S.sessions.length;
+    if(id=='snapshots') count=new Set(S.snapshots.map(s=>s.session)).size;
+    if(id=='copilot') count=S.copilot.total;
+  }
+  const live = S && ((id=='sessions'&&S.sessions.length)||(id=='copilot'&&S.copilot.running.length));
+  return `<button class="nav ${page==id?'on':''}" ${page==id?'aria-current="page"':''} onclick="show('${id}')">${ic(icn)}${label}<span class="count">${count}</span>${live?'<span class="live"></span>':''}</button>`;
+}
+function renderChrome(){
+  $('nav').innerHTML = navItem('overview')
+    + `<div class="navlabel">tmux</div>` + navItem('sessions') + navItem('snapshots')
+    + `<div class="navlabel">Agents</div>` + navItem('copilot')
+    + `<div class="navlabel">Maintain</div>` + navItem('cleanup') + navItem('settings');
+  if(!S) return;
+  const st=S.settings, tm=S.sessions.reduce((a,s)=>a+s.rss,0), cm=S.copilot.running.filter(c=>!c.tmux).reduce((a,c)=>a+c.rss,0), tot=tm+cm||1;
+  const auto = st.autosave ? (S.last_autosave ? 'saved '+ago(S.last_autosave) : 'waiting for first save') : 'off';
+  $('sidefoot').innerHTML=`
+    <button class="foot-row" onclick="show('settings')"><span class="pulse ${st.autosave?'':'off'}"></span><span>Auto-save <b>${esc(auto)}</b></span></button>
+    <div class="foot-row static"><span>Memory</span><b>${size(tm+cm)}</b></div>
+    <div class="meter"><i style="width:${tm/tot*100}%;background:var(--positive)"></i><i style="width:${cm/tot*100}%;background:var(--agent)"></i></div>
+    <div class="legend"><span style="--c:var(--positive)">tmux</span><span style="--c:var(--agent)">Copilot outside tmux</span></div>`;
+  $('banner').innerHTML = S.tmux ? '' : `<div class="banner">${ic('alert')}<div><b>tmux is not installed.</b> Install it with <code>brew install tmux</code>, then reopen this window.</div></div>`;
+}
+function setTop(){
+  const [, , label, sub] = PAGES.find(p=>p[0]==page);
+  $('title').textContent=label; $('subtitle').textContent=sub;
+  const a = {
+    overview:`<button class="btn" onclick="saveAll()">${ic('save')}Save all</button><button class="btn primary" onclick="newSession()">${ic('plus')}New session</button>`,
+    sessions:`<button class="btn" onclick="saveAll()">${ic('save')}Save all</button><button class="btn primary" onclick="newSession()">${ic('plus')}New session</button>`,
+    snapshots:`<button class="btn" onclick="saveAll()">${ic('save')}Save all now</button>`,
+    copilot:'', cleanup:'', settings: native?`<button class="btn" onclick="native.postMessage({action:'folder'})">${ic('folder')}Open data folder</button>`:'',
+  }[page];
+  $('topacts').innerHTML=a;
+}
+function show(p){
+  if(!PAGES.some(x=>x[0]==p)) p='overview';
+  page=p; history.replaceState(null,'','#'+p); closeDrawer(true);
+  renderChrome(); setTop(); renderPage(true); $('main').scrollTop=0;
+}
+function renderPage(full){
+  if(!S){ $('view').innerHTML=`<div class="list">${'<div class="skeleton"></div>'.repeat(4)}</div>`; return; }
+  if(page=='overview') renderOverview();
+  else if(page=='sessions') renderSessions();
+  else if(page=='snapshots') renderSnapshots();
+  else if(page=='copilot') renderCopilot();
+  else if(full && page=='cleanup') renderCleanup();
+  else if(full && page=='settings') renderSettings();
 }
 
+// ===================================================================== overview
+async function loadPlan(){
+  if(Date.now()-planAt<30000 && planCache) return planCache;
+  try{ planCache=await api('/api/cleanup',{apply:false}); planAt=Date.now(); }catch{ planCache=null; }
+  return planCache;
+}
+function renderOverview(){
+  const ss=S.sessions, run=S.copilot.running, st=S.settings;
+  const tm=ss.reduce((a,s)=>a+s.rss,0), cm=run.reduce((a,c)=>a+c.rss,0), cmOut=run.filter(c=>!c.tmux).reduce((a,c)=>a+c.rss,0);
+  const snapDisk=S.snapshots.reduce((a,s)=>a+s.size,0);
+  const items=[...ss.map(s=>({n:s.name, v:s.rss, c:'var(--positive)', icn:'term', go:`show('sessions')`})),
+               ...run.filter(c=>!c.tmux).map(c=>({n:cpTitle(c), v:c.rss, c:'var(--agent)', icn:'spark', go:`openCp(${arg(c.id)})`}))]
+              .sort((a,b)=>b.v-a.v).slice(0,7);
+  const max=Math.max(1,...items.map(i=>i.v));
+  const recent=[...run.map(c=>({...c,live:1})), ...S.copilot.recent].slice(0,6);
+  $('view').innerHTML=`
+    <div class="metrics">
+      <button class="metric" style="--c:var(--positive)" onclick="show('sessions')"><span class="k">${ic('term')}tmux sessions</span><span class="v">${ss.length}</span><span class="s">${size(tm)} memory · ${ss.filter(s=>s.attached).length} attached</span></button>
+      <button class="metric" style="--c:var(--agent)" onclick="show('copilot')"><span class="k">${ic('spark')}Copilot running</span><span class="v">${run.length}</span><span class="s">${size(cm)} memory · ${S.copilot.total} saved</span></button>
+      <div class="metric" style="--c:var(--info)"><span class="k">${ic('cpu')}Memory in use</span><span class="v">${size(tm+cmOut)}</span><span class="s">by tmux and Copilot</span></div>
+      <button class="metric" style="--c:var(--warning)" onclick="show('cleanup')"><span class="k">${ic('disk')}On disk</span><span class="v">${size(snapDisk+S.copilot.total_size)}</span><span class="s">${size(snapDisk)} snapshots · ${size(S.copilot.total_size)} Copilot</span></button>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>${ic('cpu')}Memory by session</h3>
+        ${items.length?`<div class="bars">${items.map(i=>`<button class="barrow" style="--c:${i.c}" onclick="${i.go}"><span class="n">${ic(i.icn)}${esc(i.n)}</span><span class="bar"><i style="width:${Math.max(2,i.v/max*100)}%"></i></span><span class="val">${size(i.v)}</span></button>`).join('')}</div>`
+          :`<div class="empty"><div class="ic">${ic('cpu')}</div><b>Nothing running</b>Start a tmux session or Copilot.</div>`}
+      </div>
+      <div class="panel"><h3>${ic('broom')}Suggestions</h3><div id="sugg"><div class="skeleton" style="border:0"></div></div></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h3>${ic('spark')}Recent Copilot sessions<span class="spacer"></span><button class="linkish" onclick="show('copilot')">View all</button></h3>
+        ${recent.length?recent.map(c=>`<button class="suggest" onclick="openCp(${arg(c.id)})"><span class="ic" style="--c:var(--agent);--c-soft:var(--agent-soft)">${ic('spark')}</span>
+          <span class="t"><b>${esc(cpTitle(c))}</b><span>${home(c.cwd)} · ${c.live?'running now':ago(c.last_active)}</span></span>${c.live?'<span class="badge positive">running</span>':''}</button>`).join('')
+          :`<div class="empty">No Copilot sessions yet.</div>`}
+      </div>
+      <div class="panel"><h3>${ic('history')}Auto-save<span class="spacer"></span><button class="linkish" onclick="show('settings')">Settings</button></h3>
+        <div class="pad">
+          <div class="inline" style="margin-bottom:12px"><span class="pulse ${st.autosave?'':'off'}"></span><b style="color:var(--text)">${st.autosave?`On · every ${st.interval_min} min`:'Off'}</b></div>
+          <dl class="facts">
+            <dt>Last save</dt><dd>${S.last_autosave?ago(S.last_autosave):'not yet'}</dd>
+            <dt>Next save</dt><dd>${st.autosave?(S.last_autosave?`in about ${Math.max(1,Math.round((S.last_autosave+st.interval_min*60-Date.now()/1000)/60))} min`:'within a minute'):'—'}</dd>
+            <dt>Keeps</dt><dd>all from the last hour, then hourly, then daily for ${plural(st.keep_days,'day')}</dd>
+            <dt>Snapshots</dt><dd>${S.snapshots.length} · ${size(snapDisk)}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>`;
+  loadPlan().then(p=>{
+    const el=$('sugg'); if(!el) return;
+    const rows=[];
+    const idleCp=run.filter(c=>Date.now()/1000-c.last_active>3600&&!c.tmux);
+    if(idleCp.length) rows.push(['agent','spark',`${plural(idleCp.length,'idle Copilot session')} outside tmux`,`${size(idleCp.reduce((a,c)=>a+c.rss,0))} memory · move to tmux or stop`,`show('copilot')`,'Review']);
+    if(p?.copilot.length) rows.push(['warning','trash',`${plural(p.copilot.length,'old Copilot session')}`,`frees ${size(p.copilot_bytes)} on disk`,`show('cleanup')`,'Clean up']);
+    if(p?.delete.length) rows.push(['warning','history',`${plural(p.delete.length,'old snapshot')}`,`frees ${size(p.bytes)}`,`show('cleanup')`,'Clean up']);
+    if(p?.close.length) rows.push(['info','term',`${plural(p.close.length,'idle tmux session')}`,`frees ${size(p.rss)} memory`,`show('cleanup')`,'Clean up']);
+    if(!st.autosave) rows.push(['danger','alert','Auto-save is off','Your tmux sessions are lost on restart',`show('settings')`,'Turn on']);
+    el.innerHTML = rows.length ? rows.map(([c,icn,t,d,go,b])=>`<div class="suggest"><div class="ic" style="--c:var(--${c});--c-soft:var(--${c}-soft)">${ic(icn)}</div><div class="t"><b>${t}</b><span>${d}</span></div><button class="btn sm" onclick="${go}">${b}</button></div>`).join('')
+      : `<div class="empty"><div class="ic">${ic('check')}</div><b>All tidy</b>Nothing to clean up right now.</div>`;
+  });
+}
+
+// ===================================================================== tmux sessions
+function memCell(v,max,c){ return `<div class="memcell" style="--c:${c}"><div class="bar"><i style="width:${Math.max(2,v/max*100)}%"></i></div><span>${size(v)}</span></div>`; }
 function renderSessions(){
   const ss=S.sessions;
-  if(!ss.length){ $('sessions').innerHTML=`<div class="list"><div class="empty"><b>No tmux sessions running</b>Create one, or restore from Snapshots.</div></div>`; return; }
-  $('sessions').innerHTML=`<div class="grid">${ss.map(s=>`
-    <div class="card">
-      <div class="top"><h3><span class="dot ${s.attached?'on':''}" title="${s.attached?'Attached':'Detached'}"></span><span class="n">${esc(s.name)}</span></h3>
-        <div class="spacer"></div><span class="mem" title="Memory used by everything running in this session">${size(s.rss)}</span></div>
-      <div class="meta">${plural(s.windows,'window')} · ${plural(s.panes,'pane')} · active ${ago(s.activity)}</div>
-      ${copilotChips(s.copilot)}
-      <div class="actions">
-        <button class="primary" onclick="attach(${arg(s.name)})">Attach</button>
-        <button onclick="save(${arg(s.name)})">Save</button>
-        <button onclick="closeSess(${arg(s.name)})" title="Save, then end the session">Close</button>
-        <div class="spacer"></div>
-        <button class="ghost danger" onclick="killSess(${arg(s.name)})" title="End without saving">Kill</button>
+  if(!ss.length){ $('view').innerHTML=`<div class="list"><div class="empty"><div class="ic">${ic('term')}</div><b>No tmux sessions running</b>Create one, or restore one from Snapshots.<div style="margin-top:14px;display:flex;gap:8px;justify-content:center"><button class="btn primary" onclick="newSession()">${ic('plus')}New session</button><button class="btn" onclick="show('snapshots')">${ic('history')}Snapshots</button></div></div></div>`; return; }
+  const max=Math.max(1,...ss.map(s=>s.rss));
+  $('view').innerHTML=`<div class="list">${ss.map(s=>`
+    <div class="row">
+      <span class="status ${s.attached?'on':''}" title="${s.attached?'Attached':'Detached'}"></span>
+      <div><div class="title"><span class="nm">${esc(s.name)}</span>${s.attached?'<span class="badge positive">attached</span>':''}
+        ${s.copilot.map(c=>`<button class="badge agent" title="Copilot running here. Open its summary." onclick="openCp(${arg(c.id)})">${ic('spark')}${esc(cpTitle(c))}</button>`).join('')}</div>
+        <div class="meta">${plural(s.windows,'window')} · ${plural(s.panes,'pane')} · active ${ago(s.activity)}</div></div>
+      ${memCell(s.rss,max,'var(--positive)')}
+      <div class="acts">
+        <button class="btn sm ghost hov" title="Save a snapshot" onclick="save(${arg(s.name)})">${ic('save')}Save</button>
+        <button class="btn sm ghost hov" title="Save, then end the session" onclick="closeSess(${arg(s.name)})">${ic('x')}Close</button>
+        <button class="btn sm ghost danger hov icon" title="Kill without saving" aria-label="Kill ${esc(s.name)} without saving" onclick="killSess(${arg(s.name)})">${ic('trash')}</button>
+        <button class="btn sm primary" onclick="attach(${arg(s.name)})">${ic('in')}Attach</button>
       </div>
     </div>`).join('')}</div>`;
 }
 
-function renderCopilot(){
-  const {running, recent}=S.copilot;
-  const home=p=>esc((p||'').replace(/^\/(Users|home)\/[^/]+/,'~'));
-  const runRows = running.map(c=>`<div class="item click" onclick="cpToggle(${arg(c.id)})">
-      <span class="dot on"></span>
-      <div class="body"><div class="row"><b>${esc(cpTitle(c))}</b>${c.tmux?`<span class="tag green">tmux: ${esc(c.tmux)}</span>`:`<span class="tag">${esc(c.app||'terminal')}${c.tty?' · '+esc(c.tty):''}</span>`}</div>
-        <div class="meta">${home(c.cwd)} · active ${ago(c.last_active)}</div></div>
-      <span class="mem" title="Memory">${size(c.rss)}</span>
-      <div class="acts" onclick="event.stopPropagation()">
-        ${c.tmux?`<button class="primary" onclick="attach(${arg(c.tmux)})">Attach</button>`
-                :`<button onclick="cpMove(${arg(c.id)},${arg(cpTitle(c))},${arg(c.app)})">Move to tmux…</button>`}
-        <button class="ghost danger" onclick="cpStop(${arg(c.id)},${arg(cpTitle(c))})">Stop</button>
-      </div></div>${openCp.has(c.id)?cpDetailHtml(c.id):''}`).join('');
-  const f=cpFilter.toLowerCase();
-  const list=recent.filter(c=>!f||(c.title+' '+c.cwd+' '+c.id).toLowerCase().includes(f));
-  const recRows = list.slice(0,cpShow).map(c=>`<div class="item click" onclick="cpToggle(${arg(c.id)})">
-      <span class="dot"></span>
-      <div class="body"><b>${esc(cpTitle(c))}</b>
-        <div class="meta">${home(c.cwd)} · ${ago(c.last_active)} · ${size(c.size)}</div></div>
-      <div class="acts" onclick="event.stopPropagation()">
-        <button class="primary" onclick='cpResume(${esc(JSON.stringify({id:c.id,cwd:c.cwd}))})' title="Open in your terminal">Resume</button>
-        <button onclick="cpResumeTmux(${arg(c.id)},${arg(cpTitle(c))})">Resume in tmux…</button>
-        <button class="ghost danger" onclick="cpDelete(${arg(c.id)},${arg(cpTitle(c))},${c.size})">Delete</button>
-      </div></div>${openCp.has(c.id)?cpDetailHtml(c.id):''}`).join('');
-  const focused=document.activeElement?.id=='cpq';
-  $('copilot').innerHTML=`
-    <p class="meta" style="margin:0 0 12px">Click a session to see its summary.</p>
-    <div class="sec"><h4 style="margin:0 0 8px">Running <span class="meta">· ${running.length}</span></h4>
-      <div class="list">${runRows||'<div class="empty"><b>No Copilot sessions running</b>Resume one below.</div>'}</div></div>
-    <div class="sec" style="margin-top:22px"><div class="row" style="margin-bottom:8px"><h4 style="margin:0">Saved <span class="meta">· ${S.copilot.total-running.length}</span></h4><div class="spacer"></div>
-      <input type="text" id="cpq" placeholder="Search title, folder, id…" value="${esc(cpFilter)}" oninput="cpFilter=this.value;cpShow=15;renderCopilot()" style="width:240px"></div>
-      <div class="list">${recRows||'<div class="empty">Nothing found</div>'}</div>
-      ${list.length>cpShow?`<div style="text-align:center;margin-top:10px"><button class="ghost" onclick="cpShow+=30;renderCopilot()">Show more (${list.length-cpShow})</button></div>`:''}</div>`;
-  if(focused){ const q=$('cpq'); q.focus(); q.setSelectionRange(q.value.length,q.value.length); }
-}
-
-function snapLine(s){
-  const cps=s.copilot?.length?` · ✦ ${esc(s.copilot.join(', '))}`:'';
-  return `${ago(s.saved_at)} · ${s.auto?'auto':'manual'} · ${plural(s.windows,'window')}, ${plural(s.panes,'pane')} · ${size(s.size)}${cps}`;
-}
+// ===================================================================== snapshots
+const openGroups=new Set();
+function toggleGroup(n){ openGroups.has(n)?openGroups.delete(n):openGroups.add(n); renderSnapshots(); }
 function renderSnapshots(){
   const groups={}; for(const s of S.snapshots) (groups[s.session] ??= []).push(s);
-  const running=new Set(S.sessions.map(s=>s.name));
-  const names=Object.keys(groups);
-  if(!names.length){ $('snapshots').innerHTML=`<div class="list"><div class="empty"><b>No snapshots yet</b>Save a session, or turn on auto-save in Settings.</div></div>`; return; }
-  $('snapshots').innerHTML=`<div class="list">${names.map(n=>{
-    const [latest,...older]=groups[n], open=openGroups.has(n), live=running.has(n);
-    const total=groups[n].reduce((a,s)=>a+s.size,0);
-    return `<div class="item">
-      <span class="dot ${live?'on':''}" title="${live?'Running now':'Not running'}"></span>
-      <div class="body">
-        <div class="row"><b>${esc(n)}</b>${live?'<span class="tag green">running</span>':''}
-          ${older.length?`<span class="more" onclick="toggleGroup(${arg(n)})">${open?'Hide':'Show'} ${plural(older.length,'older version')} (${size(total)})</span>`:''}</div>
-        <div class="meta">${snapLine(latest)}</div>
-      </div>
+  const running=new Set(S.sessions.map(s=>s.name)), names=Object.keys(groups);
+  if(!names.length){ $('view').innerHTML=`<div class="list"><div class="empty"><div class="ic">${ic('history')}</div><b>No snapshots yet</b>Save a session, or turn on auto-save in Settings.</div></div>`; return; }
+  const cp = s => s.copilot?.length ? ` · <span style="color:var(--agent)">✦ ${esc(s.copilot.join(', '))}</span>` : '';
+  $('view').innerHTML=`<div class="list">${names.map(n=>{
+    const [latest,...older]=groups[n], open=openGroups.has(n), live=running.has(n), total=groups[n].reduce((a,s)=>a+s.size,0);
+    return `<div class="row" style="grid-template-columns:18px minmax(0,1fr) auto">
+      <span class="status ${live?'on':''}"></span>
+      <div><div class="title"><span class="nm">${esc(n)}</span>${live?'<span class="badge positive">running</span>':''}<span class="badge">${latest.auto?'auto':'manual'}</span></div>
+        <div class="meta">Saved ${ago(latest.saved_at)} · ${plural(latest.windows,'window')}, ${plural(latest.panes,'pane')}${cp(latest)}
+        ${older.length?` · <button class="linkish" onclick="toggleGroup(${arg(n)})">${open?'Hide':'Show'} ${plural(older.length,'older version')}</button> <span>(${size(total)})</span>`:''}</div></div>
       <div class="acts">
-        ${live?`<button onclick="restore(${arg(latest.file)},${arg(n)},true)">Restore as…</button>`
-              :`<button class="primary" onclick="restore(${arg(latest.file)},${arg(n)},false)">Restore</button>
-                <button class="ghost" title="Restore under a new name" onclick="restore(${arg(latest.file)},${arg(n)},true)">As…</button>`}
-        <button class="ghost danger" title="Delete this snapshot" onclick="delSnap(${arg(latest.file)})">Delete</button>
+        <button class="btn sm ghost danger hov icon" title="Delete this snapshot" aria-label="Delete snapshot of ${esc(n)}" onclick="delSnap(${arg(latest.file)})">${ic('trash')}</button>
+        ${live?`<button class="btn sm" onclick="restore(${arg(latest.file)},${arg(n)},true)">${ic('copy')}Restore as…</button>`
+              :`<button class="btn sm ghost hov" onclick="restore(${arg(latest.file)},${arg(n)},true)">As…</button><button class="btn sm positive" onclick="restore(${arg(latest.file)},${arg(n)},false)">${ic('history')}Restore</button>`}
       </div></div>
-      ${open?`<div class="older">${older.map(s=>`<div class="item"><div class="body meta" style="margin:0">${snapLine(s)}</div>
-        <div class="acts"><button class="ghost" onclick="restore(${arg(s.file)},${arg(n)},${live})">Restore${live?' as…':''}</button>
-        <button class="ghost danger" onclick="delSnap(${arg(s.file)})">Delete</button></div></div>`).join('')}</div>`:''}`;
+      ${open?`<div class="sub-rows">${older.map(s=>`<div class="tl"><span class="dot"></span><div>${new Date(s.saved_at*1000).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})} · ${ago(s.saved_at)} · ${s.auto?'auto':'manual'} · ${plural(s.panes,'pane')} · ${size(s.size)}</div>
+        <div class="acts" style="display:flex;gap:4px"><button class="btn sm ghost" onclick="restore(${arg(s.file)},${arg(n)},${live})">Restore${live?' as…':''}</button><button class="btn sm ghost danger icon" aria-label="Delete this snapshot" onclick="delSnap(${arg(s.file)})">${ic('trash')}</button></div></div>`).join('')}</div>`:''}`;
   }).join('')}</div>`;
 }
 
-// settings controls
+// ===================================================================== copilot
+let cpTab='running', cpFilter='', cpShow=25;
+function renderCopilot(){
+  const {running, recent}=S.copilot;
+  if(cpTab=='running' && !running.length && recent.length) cpTab='saved';
+  const f=cpFilter.toLowerCase(), match=c=>!f||(c.title+' '+c.cwd+' '+c.id).toLowerCase().includes(f);
+  const max=Math.max(1,...running.map(c=>c.rss));
+  let rows='';
+  if(cpTab=='running'){
+    const list=running.filter(match);
+    rows = list.map(c=>`<div class="row click" onclick="openCp(${arg(c.id)})">
+      <span class="status cp"></span>
+      <div><div class="title"><button class="nm" onclick="event.stopPropagation();openCp(${arg(c.id)})">${esc(cpTitle(c))}</button>${c.tmux?`<span class="badge positive">${ic('term')}${esc(c.tmux)}</span>`:`<span class="badge warning" title="Not in tmux: closes with its window">${esc(c.app||'terminal')}${c.tty?' · '+esc(c.tty):''}</span>`}</div>
+        <div class="meta">${home(c.cwd)} · active ${ago(c.last_active)}</div></div>
+      ${memCell(c.rss,max,'var(--agent)')}
+      <div class="acts" onclick="event.stopPropagation()">
+        <button class="btn sm ghost danger hov" onclick="cpStop(${arg(c.id)},${arg(cpTitle(c))})">${ic('stop')}Stop</button>
+        ${c.tmux?`<button class="btn sm primary" onclick="attach(${arg(c.tmux)})">${ic('in')}Attach</button>`
+                :`<button class="btn sm agent" onclick="cpMove(${arg(c.id)},${arg(cpTitle(c))},${arg(c.app)})">${ic('move')}Move to tmux</button>`}
+      </div></div>`).join('') || `<div class="empty"><div class="ic">${ic('spark')}</div><b>${f?'No matches':'No Copilot sessions running'}</b>${f?'':'Resume one from Saved.'}</div>`;
+  } else {
+    const list=recent.filter(match);
+    rows = list.slice(0,cpShow).map(c=>`<div class="row click" onclick="openCp(${arg(c.id)})">
+      <span class="status"></span>
+      <div><div class="title"><button class="nm" onclick="event.stopPropagation();openCp(${arg(c.id)})">${esc(cpTitle(c))}</button></div><div class="meta">${home(c.cwd)} · ${ago(c.last_active)}</div></div>
+      <div class="memcell"><span style="width:auto;margin-left:auto">${size(c.size)}</span></div>
+      <div class="acts" onclick="event.stopPropagation()">
+        <button class="btn sm ghost danger hov icon" title="Delete" aria-label="Delete ${esc(cpTitle(c))}" onclick="cpDelete(${arg(c.id)},${arg(cpTitle(c))},${c.size})">${ic('trash')}</button>
+        <button class="btn sm ghost hov" title="Resume in tmux" onclick="cpResumeTmux(${arg(c.id)},${arg(cpTitle(c))})">${ic('term')}tmux…</button>
+        <button class="btn sm primary" onclick='cpResume(${esc(JSON.stringify({id:c.id,cwd:c.cwd}))})'>${ic('play')}Resume</button>
+      </div></div>`).join('') || `<div class="empty"><div class="ic">${ic('search')}</div><b>Nothing found</b></div>`;
+    if(list.length>cpShow) rows+=`<div class="more"><button class="btn sm ghost" onclick="cpShow+=50;renderCopilot()">Show ${Math.min(50,list.length-cpShow)} more of ${list.length-cpShow}</button></div>`;
+  }
+  const focused=document.activeElement?.id=='cpq';
+  $('view').innerHTML=`
+    <div class="toolbar">
+      <div class="seg"><button aria-pressed="${cpTab=='running'}" onclick="cpTab='running';renderCopilot()">Running<span>${running.length}</span></button><button aria-pressed="${cpTab=='saved'}" onclick="cpTab='saved';renderCopilot()">Saved<span>${S.copilot.total-running.length}</span></button></div>
+      <div class="spacer"></div>
+      <label class="input">${ic('search')}<input id="cpq" aria-label="Filter Copilot sessions" placeholder="Filter by title, folder or id" value="${esc(cpFilter)}" oninput="cpFilter=this.value;cpShow=25;renderCopilot()"><kbd>/</kbd></label>
+    </div>
+    <div class="list">${rows}</div>`;
+  if(focused){ const q=$('cpq'); q.focus(); q.setSelectionRange(q.value.length,q.value.length); }
+}
+
+// drawer with a Copilot session's summary
+let drawerId=null, drawerReturn=null;
+function closeDrawer(silent){
+  if(!drawerId){ return; }
+  drawerId=null; $('drawer').classList.remove('show'); $('scrim').classList.remove('show');
+  if(!silent) drawerReturn?.focus?.();
+}
+async function openCp(id){
+  if(!drawerId) drawerReturn=document.activeElement;
+  drawerId=id; renderDrawer(null);
+  $('drawer').classList.add('show'); $('scrim').classList.add('show'); $('dClose')?.focus();
+  try{ const d=await api('/api/copilot/detail',{id}); if(drawerId==id) renderDrawer(d); }catch(e){ if(drawerId==id) renderDrawer({error:e.message}); }
+}
+function renderDrawer(d){
+  const id=drawerId, live=S.copilot.running.find(c=>c.id==id), base=live||S.copilot.recent.find(c=>c.id==id)||{id,title:'',cwd:''};
+  const title=cpTitle(d&&d.title?d:base);
+  const acts = live
+    ? (live.tmux?`<button class="btn sm primary" onclick="attach(${arg(live.tmux)})">${ic('in')}Attach</button>`:`<button class="btn sm agent" onclick="cpMove(${arg(id)},${arg(title)},${arg(live.app)})">${ic('move')}Move to tmux…</button>`)
+      + `<button class="btn sm" onclick="copyResume(${arg(id)})">${ic('copy')}Copy command</button><button class="btn sm danger" onclick="cpStop(${arg(id)},${arg(title)})">${ic('stop')}Stop</button>`
+    : `<button class="btn sm primary" onclick='cpResume(${esc(JSON.stringify({id,cwd:base.cwd||d?.cwd||""}))})'>${ic('play')}Resume</button>
+       <button class="btn sm" onclick="cpResumeTmux(${arg(id)},${arg(title)})">${ic('term')}Resume in tmux…</button>
+       <button class="btn sm" onclick="copyResume(${arg(id)})">${ic('copy')}Copy command</button>
+       <button class="btn sm danger" onclick="cpDelete(${arg(id)},${arg(title)},${d?.size||base.size||0})">${ic('trash')}Delete</button>`;
+  const status = live ? `<span class="badge positive">running</span> ${live.tmux?`<span class="badge">${ic('term')}${esc(live.tmux)}</span>`:`<span class="badge warning">${esc(live.app||'terminal')}</span>`} · ${size(live.rss)} memory` : `<span class="badge">stopped</span> · last active ${ago(base.last_active||d?.last_active||0)}`;
+  let body;
+  if(!d) body=`<div class="skeleton" style="border:0;margin-top:16px;border-radius:8px"></div><div class="skeleton" style="border:0;margin-top:8px;border-radius:8px;height:90px"></div>`;
+  else if(d.error) body=`<p class="quote" style="margin-top:16px">${esc(d.error)}</p>`;
+  else {
+    const sec=(h,html)=>html?`<h3>${h}</h3>${html}`:'';
+    const summary=d.overview||(d.first_ask?`Started with: ${d.first_ask}`:'');
+    body = sec('Summary', summary?`<p>${esc(summary)}</p>`:`<p class="quote">No summary recorded yet.</p>`)
+      + sec('Next steps', d.next_steps&&`<p>${esc(d.next_steps)}</p>`)
+      + sec('Last request', d.last_ask&&d.last_ask!==d.first_ask&&`<p class="quote">${esc(d.last_ask)}</p>`)
+      + sec('Last reply', d.last_reply&&`<p class="quote">${esc(d.last_reply)}</p>`)
+      + sec('Checkpoints', d.checkpoints.length&&`<ul>${d.checkpoints.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`)
+      + sec('PRs & commits', d.refs.length&&`<ul>${d.refs.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`)
+      + sec(`Files${d.file_count>d.files.length?` (${d.files.length} of ${d.file_count})`:''}`, d.files.length&&`<ul>${d.files.map(f=>`<li><code>${esc(f)}</code></li>`).join('')}</ul>`)
+      + `<h3>Details</h3><dl class="facts">
+          <dt>Folder</dt><dd>${home(d.cwd)||'—'}</dd>
+          ${d.repository?`<dt>Repository</dt><dd>${esc(d.repository)}${d.branch?' @ '+esc(d.branch):''}</dd>`:''}
+          <dt>Requests</dt><dd>${d.turns||0}</dd>
+          ${d.model?`<dt>Model</dt><dd>${esc(d.model)}</dd>`:''}
+          <dt>On disk</dt><dd>${size(d.size)}</dd>
+          <dt>Session id</dt><dd><button class="linkish" onclick="copy(${arg(id)})">${esc(id)}</button></dd>
+        </dl>`;
+  }
+  $('drawer').innerHTML=`<button class="btn ghost icon x" id="dClose" onclick="closeDrawer()" title="Close (esc)" aria-label="Close">${ic('x')}</button>
+    <header><h2 id="dTitle">${esc(title)}</h2><div class="meta">${status}</div><div class="acts">${acts}</div></header>
+    <div class="body">${body}</div>`;
+}
+
+// ===================================================================== settings & cleanup
 const sw=(k,label,hint='')=>`<div class="opt"><div class="l">${label}${hint?`<small>${hint}</small>`:''}</div>
-  <label class="sw"><input type="checkbox" ${S.settings[k]?'checked':''} onchange="setSetting('${k}',this.checked)"><i></i></label></div>`;
+  <label class="sw"><input type="checkbox" role="switch" aria-label="${esc(label)}" ${S.settings[k]?'checked':''} onchange="setSetting('${k}',this.checked)"><i></i></label></div>`;
 const sel=(k,label,opts,hint='')=>`<div class="opt"><div class="l">${label}${hint?`<small>${hint}</small>`:''}</div>
-  <select onchange="setSetting('${k}',isNaN(+this.value)?this.value:+this.value)">${opts.map(([v,t])=>`<option value="${v}" ${S.settings[k]==v?'selected':''}>${t}</option>`).join('')}</select></div>`;
-const num=(k,label,unit,hint='')=>`<div class="opt"><div class="l">${label}${hint?`<small>${hint}</small>`:''}</div>
-  <div class="row"><input type="number" min="1" value="${S.settings[k]}" onchange="setSetting('${k}',+this.value)"><span class="meta" style="margin:0">${unit}</span></div></div>`;
+  <select aria-label="${esc(label)}" onchange="setSetting('${k}',isNaN(+this.value)?this.value:+this.value)">${opts.map(([v,t])=>`<option value="${v}" ${S.settings[k]==v?'selected':''}>${t}</option>`).join('')}</select></div>`;
+const daysRule=(on,days,label,hint)=>`<div class="opt"><div class="l">${label}<small>${hint}</small></div>
+  <div class="inline"><input type="number" min="1" aria-label="${esc(label)} (days)" value="${S.settings[days]}" onchange="setSetting('${days}',+this.value)">days
+  <label class="sw"><input type="checkbox" role="switch" aria-label="${esc(label)}" ${S.settings[on]?'checked':''} onchange="setSetting('${on}',this.checked)"><i></i></label></div></div>`;
 
 function renderSettings(){
-  $('settings').innerHTML=`
-  <div class="card sec"><h4>Auto-save</h4><p class="hint">Saves every session in the background, even when this app is closed.</p>
+  $('view').innerHTML=`<div style="max-width:720px">
+  <div class="group"><h4>Auto-save</h4><p>Saves every tmux session in the background, even when this app is closed.</p><div class="list">
     ${sw('autosave','Save sessions automatically')}
     ${sel('interval_min','Save every',[[1,'1 minute'],[5,'5 minutes'],[15,'15 minutes'],[30,'30 minutes'],[60,'1 hour']])}
     ${sel('keep_days','Keep auto-saves for',[[1,'1 day'],[3,'3 days'],[7,'1 week'],[14,'2 weeks'],[30,'1 month']],'All from the last hour, then one per hour, then one per day.')}
-  </div>
-  <div class="card sec"><h4>Terminal</h4><p class="hint">Where Attach opens a session.</p>
-    ${sel('terminal','Open sessions in',[['auto','Automatic'],['terminal','Terminal'],['iterm','iTerm'],['copy','Copy command (for Termius, Warp…)']],'Automatic uses iTerm if it is open, otherwise Terminal.')}
-    <div class="opt"><div class="l">Copilot command<small>Used to resume Copilot sessions, e.g. <code>copilot --yolo</code></small></div>
-      <input type="text" value="${esc(S.settings.copilot_cmd)}" onchange="setSetting('copilot_cmd',this.value)" style="width:200px"></div>
-  </div>
-  <div class="card sec"><h4>Restore</h4><p class="hint">What happens when you restore a snapshot.</p>
+  </div></div>
+  <div class="group"><h4>Terminal</h4><p>Where Attach and Resume open.</p><div class="list">
+    ${sel('terminal','Open in',[['auto','Automatic'],['terminal','Terminal'],['iterm','iTerm'],['copy','Copy the command (Termius, Warp…)']],'Automatic uses iTerm if it is open, otherwise Terminal.')}
+    <div class="opt"><div class="l">Copilot command<small>How you start Copilot, e.g. <code>copilot --yolo</code></small></div>
+      <input type="text" aria-label="Copilot command" value="${esc(S.settings.copilot_cmd)}" onchange="setSetting('copilot_cmd',this.value)" style="width:200px"></div>
+  </div></div>
+  <div class="group"><h4>Restore</h4><p>What happens when you restore a tmux snapshot.</p><div class="list">
     ${sw('restore_replay','Show previous output','Prints the saved screen back into each pane.')}
-    ${sw('restore_run','Run saved commands','Otherwise they are typed but not run, e.g. copilot --resume=…')}
-  </div>
-  <div class="card sec"><h4>Storage</h4><p class="hint">${esc(S.snap_dir)}</p>
-    <div class="row">${native?`<button onclick="native.postMessage({action:'folder'})">Open folder</button>`:''}
-    <button onclick="show('cleanup')">Clean up…</button></div>
-  </div>
-  ${native?`<div class="card sec"><h4>App</h4>
-    <div class="opt"><div class="l">Open at login<small>Keeps the menu-bar icon available after a restart.</small></div>
-      <label class="sw"><input type="checkbox" ${window.TM_NATIVE?.loginItem?'checked':''} onchange="native.postMessage({action:'login',on:this.checked});window.TM_NATIVE.loginItem=this.checked;toast('Saved')"><i></i></label></div>
-  </div>`:''}`;
+    ${sw('restore_run','Run saved commands','Otherwise they are typed but not run.')}
+  </div></div>
+  ${native?`<div class="group"><h4>App</h4><p>${home(S.snap_dir)}</p><div class="list">
+    <div class="opt"><div class="l">Open at login<small>Keeps auto-save and the menu-bar icon after a restart.</small></div>
+      <label class="sw"><input type="checkbox" role="switch" aria-label="Open at login" ${window.TM_NATIVE?.loginItem?'checked':''} onchange="native.postMessage({action:'login',on:this.checked});window.TM_NATIVE.loginItem=this.checked;toast('Saved')"><i></i></label></div>
+  </div></div>`:''}
+  <p style="color:var(--faint);font-size:12px">Shortcuts: <kbd>⌘K</kbd> search · <kbd>⌘1</kbd>–<kbd>⌘6</kbd> pages · <kbd>/</kbd> filter · <kbd>esc</kbd> close</p>
+  </div>`;
 }
 
 async function renderCleanup(){
-  const st=S.settings;
-  $('cleanup').innerHTML=`
-  <div class="card sec"><h4>Rules</h4><p class="hint">Choose what to clean up. Changes are saved automatically.</p>
-    <div class="opt"><div class="l">Delete snapshots older than<small>Manual and auto snapshots.</small></div>
-      <div class="row"><input type="number" min="1" value="${st.cleanup_snapshot_days}" onchange="setSetting('cleanup_snapshot_days',+this.value)"><span class="meta" style="margin:0">days</span>
-      <label class="sw"><input type="checkbox" ${st.cleanup_snapshots?'checked':''} onchange="setSetting('cleanup_snapshots',this.checked)"><i></i></label></div></div>
+  $('view').innerHTML=`<div style="max-width:820px">
+  <div class="group"><h4>Rules</h4><p>Pick what to clean up. Changes save automatically.</p><div class="list">
+    ${daysRule('cleanup_snapshots','cleanup_snapshot_days','Delete snapshots older than','Manual and auto snapshots.')}
     ${sw('cleanup_keep_latest','Always keep the latest snapshot of each session')}
-    <div class="opt"><div class="l">Close sessions idle for more than<small>Detached sessions only. Saved first, so you can restore them.</small></div>
-      <div class="row"><input type="number" min="1" value="${st.cleanup_idle_days}" onchange="setSetting('cleanup_idle_days',+this.value)"><span class="meta" style="margin:0">days</span>
-      <label class="sw"><input type="checkbox" ${st.cleanup_idle?'checked':''} onchange="setSetting('cleanup_idle',this.checked)"><i></i></label></div></div>
-    <div class="opt"><div class="l">Delete Copilot sessions inactive for more than<small>Stopped sessions only. Moved to the Trash.</small></div>
-      <div class="row"><input type="number" min="1" value="${st.cleanup_copilot_days}" onchange="setSetting('cleanup_copilot_days',+this.value)"><span class="meta" style="margin:0">days</span>
-      <label class="sw"><input type="checkbox" ${st.cleanup_copilot?'checked':''} onchange="setSetting('cleanup_copilot',this.checked)"><i></i></label></div></div>
+    ${daysRule('cleanup_idle','cleanup_idle_days','Close tmux sessions idle for more than','Detached sessions only. Saved first, so you can restore them.')}
+    ${daysRule('cleanup_copilot','cleanup_copilot_days','Delete Copilot sessions inactive for more than','Stopped sessions only. Moved to the Trash.')}
     ${sw('cleanup_auto','Run automatically','After each auto-save.')}
-  </div>
-  <div class="card sec"><h4>Preview</h4><div id="plan" class="meta">Checking…</div></div>`;
+  </div></div>
+  <div class="group"><h4>Preview</h4><p>What “Clean up now” will do with these rules.</p><div class="list" id="plan"><div class="skeleton" style="border:0"></div></div></div></div>`;
   try{
-    const p=await api('/api/cleanup',{apply:false});
-    const nothing=!p.delete.length&&!p.close.length&&!p.copilot.length;
-    $('plan').innerHTML = nothing ? `<div class="preview">Nothing to clean up. 🎉</div>` : `
-      <div class="preview">
-        ${p.delete.length?`<div><b>Delete ${plural(p.delete.length,'snapshot')}</b> · frees ${size(p.bytes)}</div>
-          <ul>${p.delete.slice(0,50).map(d=>`<li>${esc(d.session)} — ${ago(d.saved_at)}</li>`).join('')}${p.delete.length>50?`<li>…and ${p.delete.length-50} more</li>`:''}</ul>`:''}
-        ${p.copilot.length?`<div style="margin-top:8px"><b>Delete ${plural(p.copilot.length,'Copilot session')}</b> · frees ${size(p.copilot_bytes)}</div>
-          <ul>${p.copilot.slice(0,50).map(c=>`<li>${esc(c.title||'Untitled session')} — ${ago(c.last_active)}</li>`).join('')}${p.copilot.length>50?`<li>…and ${p.copilot.length-50} more</li>`:''}</ul>`:''}
-        ${p.close.length?`<div style="margin-top:8px"><b>Close ${plural(p.close.length,'session')}</b> · frees ${size(p.rss)} memory</div>
-          <ul>${p.close.map(c=>`<li>${esc(c.name)} — idle since ${ago(c.activity)}</li>`).join('')}</ul>`:''}
-      </div>
-      <div class="actions"><button class="dangerfill" onclick="doCleanup()">Clean up now</button></div>`;
-  }catch(e){ $('plan').textContent=e.message; }
+    const p=await api('/api/cleanup',{apply:false}); planCache=p; planAt=Date.now();
+    const blk=(c,icn,title,sub,items)=>`<div class="line"><div class="suggest" style="padding:0;border:0;flex:1"><div class="ic" style="--c:var(--${c});--c-soft:var(--${c}-soft)">${ic(icn)}</div><div class="t"><b>${title}</b><span>${sub}</span></div></div></div><ul>${items}</ul>`;
+    const li=(arr,f)=>arr.slice(0,40).map(f).join('')+(arr.length>40?`<li>…and ${arr.length-40} more</li>`:'');
+    const parts=[];
+    if(p.delete.length) parts.push(blk('warning','history',`Delete ${plural(p.delete.length,'snapshot')}`,`frees ${size(p.bytes)}`,li(p.delete,d=>`<li>${esc(d.session)} — ${ago(d.saved_at)}</li>`)));
+    if(p.copilot.length) parts.push(blk('agent','spark',`Delete ${plural(p.copilot.length,'Copilot session')}`,`frees ${size(p.copilot_bytes)} · moved to the Trash`,li(p.copilot,c=>`<li>${esc(cpTitle(c))} — ${ago(c.last_active)}</li>`)));
+    if(p.close.length) parts.push(blk('info','term',`Close ${plural(p.close.length,'tmux session')}`,`frees ${size(p.rss)} memory · saved first`,li(p.close,c=>`<li>${esc(c.name)} — idle since ${ago(c.activity)}</li>`)));
+    $('plan').innerHTML = parts.length
+      ? `<div class="plan">${parts.join('')}<div style="margin-top:10px"><button class="btn dangerfill" onclick="doCleanup()">${ic('broom')}Clean up now</button></div></div>`
+      : `<div class="empty"><div class="ic">${ic('check')}</div><b>Nothing to clean up</b>Your rules don't match anything right now.</div>`;
+  }catch(e){ $('plan').innerHTML=`<div class="empty">${esc(e.message)}</div>`; }
 }
 async function doCleanup(){
   if(!await modal({title:'Clean up now?', text:'This deletes and closes everything listed. Copilot sessions go to the Trash.', ok:'Clean up', danger:true})) return;
   try{ const r=await api('/api/cleanup',{apply:true});
-    toast(`Deleted ${plural(r.delete.length,'snapshot')} and ${plural(r.copilot.length,'Copilot session')}, closed ${plural(r.close.length,'session')}`);
+    toast(`Cleaned up: ${plural(r.delete.length,'snapshot')}, ${plural(r.copilot.length,'Copilot session')}, ${plural(r.close.length,'tmux session')}`);
   }catch(e){ toast(e.message,true); }
-  await refresh(); renderCleanup();
+  planAt=0; await refresh(); renderCleanup();
 }
 
-function show(t){
-  tab=t; for(const b of $('tabs').children) b.classList.toggle('on', b.dataset.t==t);
-  for(const id of ['sessions','copilot','snapshots','cleanup','settings']) $(id).hidden = id!=t;
-  if(t=='settings') renderSettings();
-  if(t=='cleanup') renderCleanup();
-  history.replaceState(null,'','#'+t);
+// ===================================================================== command palette
+let palItems=[], palSel=0, palReturn=null;
+function openPalette(){ palReturn=document.activeElement; $('pal').classList.add('show'); $('palq').value=''; palRender(); $('palq').focus(); }
+function closePalette(){ $('pal').classList.remove('show'); palReturn?.focus?.(); }
+function palAll(){
+  const out=[];
+  const A=(sec,icn,label,hint,fn)=>out.push({sec,icn,label,hint,fn});
+  PAGES.forEach(([id,icn,label],i)=>A('Go to',icn,label,`⌘${i+1}`,()=>show(id)));
+  A('Actions','plus','New tmux session','',newSession);
+  A('Actions','save','Save all tmux sessions','',saveAll);
+  A('Actions','broom','Clean up…','',()=>show('cleanup'));
+  if(S){
+    S.sessions.forEach(s=>A('tmux','term',`Attach ${s.name}`,`${plural(s.windows,'window')} · ${size(s.rss)}`,()=>attach(s.name)));
+    S.copilot.running.forEach(c=>A('Copilot · running','spark',cpTitle(c),c.tmux?`tmux: ${c.tmux}`:(c.app||'terminal'),()=>openCp(c.id)));
+    S.copilot.recent.forEach(c=>A('Copilot · saved','spark',cpTitle(c),`${(c.cwd||'').replace(/^\/(Users|home)\/[^/]+/,'~')} · ${ago(c.last_active)}`,()=>openCp(c.id)));
+    const seen=new Set(S.sessions.map(s=>s.name));
+    S.snapshots.forEach(s=>{ if(seen.has(s.session)) return; seen.add(s.session); A('Restore','history',`Restore ${s.session}`,ago(s.saved_at),()=>restore(s.file,s.session,false)); });
+  }
+  return out;
 }
-$('tabs').onclick=e=>{ if(e.target.dataset.t) show(e.target.dataset.t); };
+function palRender(){
+  const q=$('palq').value.toLowerCase().trim(), words=q.split(/\s+/).filter(Boolean);
+  palItems=palAll().filter(it=>words.every(w=>(it.label+' '+it.hint+' '+it.sec).toLowerCase().includes(w))).slice(0,60);
+  palSel=Math.min(palSel,Math.max(0,palItems.length-1));
+  let last='', html='';
+  palItems.forEach((it,i)=>{ if(it.sec!==last){ html+=`<div class="palsec">${esc(it.sec)}</div>`; last=it.sec; }
+    html+=`<div class="palitem" role="option" id="pal-${i}" aria-selected="${i==palSel}" data-i="${i}" onmousemove="if(palSel!=${i}){palSel=${i};palMark()}" onclick="palRun(${i})">${ic(it.icn)}<span>${esc(it.label)}</span><span class="h">${esc(it.hint)}</span></div>`; });
+  $('palres').innerHTML = html || `<div class="empty" style="padding:24px">No results</div>`;
+  $('palq').setAttribute('aria-activedescendant', palItems.length?`pal-${palSel}`:'');
+}
+function palMark(){
+  document.querySelectorAll('.palitem').forEach(e=>e.setAttribute('aria-selected', +e.dataset.i==palSel));
+  $('palq').setAttribute('aria-activedescendant',`pal-${palSel}`);
+  document.querySelector('.palitem[aria-selected=true]')?.scrollIntoView({block:'nearest'});
+}
+function palRun(i){ const it=palItems[i]; closePalette(); it?.fn(); }
+$('palq').addEventListener('input',()=>{ palSel=0; palRender(); });
+$('palq').addEventListener('keydown',e=>{
+  if(e.key=='ArrowDown'){ palSel=Math.min(palSel+1,palItems.length-1); palMark(); e.preventDefault(); }
+  else if(e.key=='ArrowUp'){ palSel=Math.max(palSel-1,0); palMark(); e.preventDefault(); }
+  else if(e.key=='Enter'){ palRun(palSel); e.preventDefault(); }
+});
 
+// ===================================================================== keyboard
+document.addEventListener('keydown',e=>{
+  const mod=e.metaKey||e.ctrlKey, typing=/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName);
+  if(e.key=='Escape'){ if(modalOpen()) $('mCancel').click(); else if($('pal').classList.contains('show')) closePalette(); else closeDrawer(); return; }
+  if(mod && e.key.toLowerCase()=='k'){ e.preventDefault(); $('pal').classList.contains('show')?closePalette():openPalette(); return; }
+  if(mod && /^[1-6]$/.test(e.key)){ e.preventDefault(); show(PAGES[+e.key-1][0]); return; }
+  if(!typing && !mod && e.key=='/' && page=='copilot'){ e.preventDefault(); $('cpq')?.focus(); }
+});
+
+// ===================================================================== data loop
 async function refresh(){
   try{ S=await api('/api/state'); }catch(e){ return; }
-  renderStats(); renderSessions(); renderCopilot(); renderSnapshots();
-  $('banner').innerHTML = S.tmux ? '' : `<div class="card" style="margin-top:12px;border-color:var(--danger)"><b>tmux is not installed.</b>
-    <div class="meta">Install it, then reopen this window: <code>brew install tmux</code></div></div>`;
+  renderChrome(); renderPage(false);
+  if(drawerId && !S.copilot.running.some(c=>c.id==drawerId) && !S.copilot.recent.some(c=>c.id==drawerId)) closeDrawer();
 }
-refresh().then(()=>show(location.hash.slice(1)||'sessions'));
-setInterval(()=>{ if(!$('modal').classList.contains('show')) refresh(); }, 5000);
-window.addEventListener('hashchange',()=>{ const t=location.hash.slice(1); if(t&&t!=tab) show(t); });
+page = location.hash.slice(1) || 'overview';
+renderChrome(); setTop(); renderPage(true);
+refresh().then(()=>show(page));
+setInterval(()=>{ if(!modalOpen() && !$('pal').classList.contains('show')) refresh(); }, 5000);
+window.addEventListener('hashchange',()=>{ const t=location.hash.slice(1); if(t&&t!=page) show(t); });
 </script>
 </body>
 </html>
