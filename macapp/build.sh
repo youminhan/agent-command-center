@@ -13,12 +13,13 @@ rm -rf build dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" di
 
 # Universal binary: Apple Silicon + Intel, macOS 13+.
 for arch in arm64 x86_64; do
-  swiftc -O -swift-version 5 -target "$arch-apple-macos13.0" main.swift \
+  swiftc -O -swift-version 5 -target "$arch-apple-macos13.0" main.swift logo.swift \
     -o "build/ACC-$arch" -framework Cocoa -framework WebKit -framework ServiceManagement
 done
 lipo -create build/ACC-arm64 build/ACC-x86_64 -output "$APP/Contents/MacOS/AgentCommandCenter"
 
-swift icon.swift build/AppIcon.iconset
+swiftc -O -parse-as-library icon.swift logo.swift -o build/icon -framework Cocoa
+build/icon build/AppIcon.iconset "$ROOT/assets/logo.png"
 iconutil -c icns build/AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
 cp "$ROOT/app.py" "$ROOT/ui.html" "$APP/Contents/Resources/"
 

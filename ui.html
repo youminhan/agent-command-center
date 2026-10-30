@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Agent Command Center</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Ctitle%3EAgent%20Command%20Center%3C/title%3E%0A%3Cdefs%3E%0A%3ClinearGradient%20id%3D%22t%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%232a2f3a%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23101217%22/%3E%3C/linearGradient%3E%0A%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%234ade80%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2316a34a%22/%3E%3C/linearGradient%3E%0A%3ClinearGradient%20id%3D%22v%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23c4b5fd%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%237c3aed%22/%3E%3C/linearGradient%3E%0A%3C/defs%3E%0A%3Cpath%20fill%3D%22url%28%23t%29%22%20d%3D%22M72%2C16H184A56%2C56%200%200%201%20240%2C72V184A56%2C56%200%200%201%20184%2C240H72A56%2C56%200%200%201%2016%2C184V72A56%2C56%200%200%201%2072%2C16Z%22/%3E%0A%3Cpath%20fill%3D%22%23f4f4f5%22%20d%3D%22M60%2C46H104A14%2C14%200%200%201%20118%2C60V196A14%2C14%200%200%201%20104%2C210H60A14%2C14%200%200%201%2046%2C196V60A14%2C14%200%200%201%2060%2C46Z%22/%3E%0A%3Cpath%20fill%3D%22url%28%23g%29%22%20d%3D%22M136%2C52Q136%2C46%20142%2C46.24A74%2C74%200%200%201%20209.76%2C114Q210%2C120%20204%2C120H150A14%2C14%200%200%201%20136%2C106Z%22/%3E%0A%3Cpath%20fill%3D%22url%28%23v%29%22%20d%3D%22M173%2C133Q181.2%2C165.8%20214%2C174Q181.2%2C182.2%20173%2C215Q164.8%2C182.2%20132%2C174Q164.8%2C165.8%20173%2C133Z%22/%3E%0A%3C/svg%3E">
 <style>
 /* Tokens are named for their role. Solid fills keep white text at 4.5:1 or better in both modes. */
 :root{
@@ -100,7 +101,8 @@ button.metric{cursor:pointer}
 .metric .k svg{color:var(--c)}
 .metric .v{display:block;font-size:26px;font-weight:650;letter-spacing:-.03em;margin-top:6px;line-height:1.1}
 .metric .s{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;align-items:start}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .panel{background:var(--panel);border:1px solid transparent;border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden}
 .panel>h3{display:flex;align-items:center;gap:8px;margin:0;padding:13px 16px;font-size:13px;font-weight:600;border-bottom:1px solid var(--line)}
 .panel>h3 .spacer{flex:1}
@@ -267,7 +269,16 @@ code{font:12px var(--mono);background:var(--hover);padding:1px 5px;border-radius
 <div class="app">
   <aside class="side">
     <div class="brand">
-      <svg viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="24" fill="#1b2029"/><rect x="12" y="14" width="40" height="56" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="3"/><rect x="57" y="14" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><path d="M72.5 17Q74 25 81 26.5Q74 28 72.5 36Q71 28 64 26.5Q71 25 72.5 17Z" fill="#bc8cff"/><rect x="57" y="45" width="31" height="25" rx="5" fill="#0d1117" stroke="#ffffff22" stroke-width="2"/><path d="M19 27l8 6-8 6" stroke="#3fb950" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="31" y="37" width="10" height="3" rx="1.5" fill="#e6edf3"/><rect x="12" y="76" width="76" height="11" rx="4" fill="#2ea043"/></svg>
+      <svg viewBox="0 0 256 256" aria-hidden="true"><defs>
+<linearGradient id="lt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f3a"/><stop offset="1" stop-color="#101217"/></linearGradient>
+<linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ade80"/><stop offset="1" stop-color="#16a34a"/></linearGradient>
+<linearGradient id="lv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+</defs>
+<path fill="url(#lt)" d="M72,16H184A56,56 0 0 1 240,72V184A56,56 0 0 1 184,240H72A56,56 0 0 1 16,184V72A56,56 0 0 1 72,16Z"/>
+<path fill="#f4f4f5" d="M60,46H104A14,14 0 0 1 118,60V196A14,14 0 0 1 104,210H60A14,14 0 0 1 46,196V60A14,14 0 0 1 60,46Z"/>
+<path fill="url(#lg)" d="M136,52Q136,46 142,46.24A74,74 0 0 1 209.76,114Q210,120 204,120H150A14,14 0 0 1 136,106Z"/>
+<path fill="url(#lv)" d="M173,133Q181.2,165.8 214,174Q181.2,182.2 173,215Q164.8,182.2 132,174Q164.8,165.8 173,133Z"/>
+</svg>
       <div><b>Agent Command Center</b><small>tmux + Copilot</small></div>
     </div>
     <button class="searchbtn" onclick="openPalette()" aria-keyshortcuts="Meta+K"><svg class="i"><use href="#i-search"/></svg>Search or run…<kbd>⌘K</kbd></button>
@@ -492,27 +503,40 @@ function renderOverview(){
       <button class="metric" style="--c:var(--warning)" onclick="show('cleanup')"><span class="k">${ic('disk')}On disk</span><span class="v">${size(snapDisk+S.copilot.total_size)}</span><span class="s">${size(snapDisk)} snapshots · ${size(S.copilot.total_size)} Copilot</span></button>
     </div>
     <div class="grid2">
-      <div class="panel"><h3>${ic('cpu')}Memory by session</h3>
-        ${items.length?`<div class="bars">${items.map(i=>`<button class="barrow" style="--c:${i.c}" onclick="${i.go}"><span class="n">${ic(i.icn)}${esc(i.n)}</span><span class="bar"><i style="width:${Math.max(2,i.v/max*100)}%"></i></span><span class="val">${size(i.v)}</span></button>`).join('')}</div>`
-          :`<div class="empty"><div class="ic">${ic('cpu')}</div><b>Nothing running</b>Start a tmux session or Copilot.</div>`}
+      <div class="col">
+        <div class="panel"><h3>${ic('term')}tmux sessions<span class="spacer"></span><button class="linkish" onclick="show('sessions')">View all</button></h3>
+          ${ss.length?ss.slice(0,6).map(s=>`<div class="suggest">
+            <span class="ic" style="--c:var(--positive);--c-soft:var(--positive-soft)">${ic('term')}</span>
+            <span class="t"><b>${esc(s.name)}</b><span>${plural(s.windows,'window')} · ${plural(s.panes,'pane')} · ${size(s.rss)} · active ${ago(s.activity)}</span></span>
+            ${s.attached?'<span class="badge positive">attached</span>':''}
+            ${s.copilot.map(c=>`<button class="badge agent" title="Copilot running here. Open its summary." onclick="openCp(${arg(c.id)})">${ic('spark')}${esc(cpTitle(c))}</button>`).join('')}
+            <button class="btn sm primary" onclick="attach(${arg(s.name)})">${ic('in')}Attach</button>
+          </div>`).join('')+(ss.length>6?`<div class="more"><button class="btn sm ghost" onclick="show('sessions')">${ss.length-6} more</button></div>`:'')
+            :`<div class="empty"><div class="ic">${ic('term')}</div><b>No tmux sessions running</b>Start one, or restore from a snapshot.
+               <div style="margin-top:14px;display:flex;gap:8px;justify-content:center"><button class="btn primary" onclick="newSession()">${ic('plus')}New session</button><button class="btn" onclick="show('snapshots')">${ic('history')}Snapshots</button></div></div>`}
+        </div>
+        <div class="panel"><h3>${ic('spark')}Recent Copilot sessions<span class="spacer"></span><button class="linkish" onclick="show('copilot')">View all</button></h3>
+          ${recent.length?recent.map(c=>`<button class="suggest" onclick="openCp(${arg(c.id)})"><span class="ic" style="--c:var(--agent);--c-soft:var(--agent-soft)">${ic('spark')}</span>
+            <span class="t"><b>${esc(cpTitle(c))}</b><span>${home(c.cwd)} · ${c.live?'running now':ago(c.last_active)}</span></span>${c.live?'<span class="badge positive">running</span>':''}</button>`).join('')
+            :`<div class="empty">No Copilot sessions yet.</div>`}
+        </div>
       </div>
-      <div class="panel"><h3>${ic('broom')}Suggestions</h3><div id="sugg"><div class="skeleton" style="border:0"></div></div></div>
-    </div>
-    <div class="grid2" style="margin-top:12px">
-      <div class="panel"><h3>${ic('spark')}Recent Copilot sessions<span class="spacer"></span><button class="linkish" onclick="show('copilot')">View all</button></h3>
-        ${recent.length?recent.map(c=>`<button class="suggest" onclick="openCp(${arg(c.id)})"><span class="ic" style="--c:var(--agent);--c-soft:var(--agent-soft)">${ic('spark')}</span>
-          <span class="t"><b>${esc(cpTitle(c))}</b><span>${home(c.cwd)} · ${c.live?'running now':ago(c.last_active)}</span></span>${c.live?'<span class="badge positive">running</span>':''}</button>`).join('')
-          :`<div class="empty">No Copilot sessions yet.</div>`}
-      </div>
-      <div class="panel"><h3>${ic('history')}Auto-save<span class="spacer"></span><button class="linkish" onclick="show('settings')">Settings</button></h3>
-        <div class="pad">
-          <div class="inline" style="margin-bottom:12px"><span class="pulse ${st.autosave?'':'off'}"></span><b style="color:var(--text)">${st.autosave?`On · every ${st.interval_min} min`:'Off'}</b></div>
-          <dl class="facts">
-            <dt>Last save</dt><dd>${S.last_autosave?ago(S.last_autosave):'not yet'}</dd>
-            <dt>Next save</dt><dd>${st.autosave?(S.last_autosave?`in about ${Math.max(1,Math.round((S.last_autosave+st.interval_min*60-Date.now()/1000)/60))} min`:'within a minute'):'—'}</dd>
-            <dt>Keeps</dt><dd>all from the last hour, then hourly, then daily for ${plural(st.keep_days,'day')}</dd>
-            <dt>Snapshots</dt><dd>${S.snapshots.length} · ${size(snapDisk)}</dd>
-          </dl>
+      <div class="col">
+        <div class="panel"><h3>${ic('broom')}Suggestions</h3><div id="sugg"><div class="skeleton" style="border:0"></div></div></div>
+        <div class="panel"><h3>${ic('cpu')}Memory by session</h3>
+          ${items.length?`<div class="bars">${items.map(i=>`<button class="barrow" style="--c:${i.c}" onclick="${i.go}"><span class="n">${ic(i.icn)}${esc(i.n)}</span><span class="bar"><i style="width:${Math.max(2,i.v/max*100)}%"></i></span><span class="val">${size(i.v)}</span></button>`).join('')}</div>`
+            :`<div class="empty"><div class="ic">${ic('cpu')}</div><b>Nothing running</b>Start a tmux session or Copilot.</div>`}
+        </div>
+        <div class="panel"><h3>${ic('history')}Auto-save<span class="spacer"></span><button class="linkish" onclick="show('settings')">Settings</button></h3>
+          <div class="pad">
+            <div class="inline" style="margin-bottom:12px"><span class="pulse ${st.autosave?'':'off'}"></span><b style="color:var(--text)">${st.autosave?`On · every ${st.interval_min} min`:'Off'}</b></div>
+            <dl class="facts">
+              <dt>Last save</dt><dd>${S.last_autosave?ago(S.last_autosave):'not yet'}</dd>
+              <dt>Next save</dt><dd>${st.autosave?(S.last_autosave?`in about ${Math.max(1,Math.round((S.last_autosave+st.interval_min*60-Date.now()/1000)/60))} min`:'within a minute'):'—'}</dd>
+              <dt>Keeps</dt><dd>all from the last hour, then hourly, then daily for ${plural(st.keep_days,'day')}</dd>
+              <dt>Snapshots</dt><dd>${S.snapshots.length} · ${size(snapDisk)}</dd>
+            </dl>
+          </div>
         </div>
       </div>
     </div>`;

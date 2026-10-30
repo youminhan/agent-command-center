@@ -106,7 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, WKUIDelegate
         migrateLegacy()
         try? fm.createDirectory(atPath: snapDir, withIntermediateDirectories: true)
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.image = NSImage(systemSymbolName: "rectangle.split.3x1", accessibilityDescription: appName)
+        item.button?.image = Logo.menuBarImage()
         let menu = NSMenu()
         menu.delegate = self
         item.menu = menu

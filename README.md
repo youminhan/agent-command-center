@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Agent Command Center" width="128">
+  <img src="assets/logo.svg" alt="Agent Command Center logo: three tmux panes, one a radar sweep and one an AI spark" width="128">
 </p>
 
 <h1 align="center">Agent Command Center</h1>
