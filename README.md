@@ -1,178 +1,256 @@
-<p align="center">
-  <img src="assets/logo.svg" alt="Agent Command Center logo: three tmux panes, one a radar sweep and one an AI spark" width="128">
-</p>
+<div align="center">
 
-<h1 align="center">Agent Command Center</h1>
+<img src="assets/logo.svg" alt="" width="112">
 
-<p align="center">
-  <b>Manage your local tmux and Copilot CLI sessions from one Mac app.</b><br>
-  Auto-save and restore tmux, see what's using memory, and summarize, resume, move or clean up Copilot sessions.
-</p>
+# Agent Command Center
 
-<p align="center">
-  <a href="https://github.com/youminhan/agent-command-center/releases/latest"><img src="https://img.shields.io/github/v/release/youminhan/agent-command-center?color=2ea043" alt="Release"></a>
-  <img src="https://img.shields.io/badge/macOS-13%2B-0a0a0a?logo=apple" alt="macOS 13+">
-  <img src="https://img.shields.io/badge/Apple%20Silicon%20%2B%20Intel-universal-8957e5" alt="Universal">
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/youminhan/agent-command-center?color=blue" alt="License"></a>
-</p>
+**Mission control for your terminal sessions and AI coding agents, on your Mac.**
 
----
+Never lose a tmux session to a restart. See every Copilot CLI agent, what it's doing and what it costs your memory.<br>
+Resume, move or clean it all up from one native app.
+
+[![Latest release](https://img.shields.io/github/v/release/youminhan/agent-command-center?style=flat-square&color=7c3aed&label=release)](https://github.com/youminhan/agent-command-center/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/youminhan/agent-command-center/total?style=flat-square&color=16a34a)](https://github.com/youminhan/agent-command-center/releases)
+[![macOS 13+](https://img.shields.io/badge/macOS-13%2B-18181b?style=flat-square&logo=apple)](#requirements)
+[![Universal](https://img.shields.io/badge/Apple%20silicon%20%2B%20Intel-universal-18181b?style=flat-square)](#requirements)
+[![License: Apache-2.0](https://img.shields.io/github/license/youminhan/agent-command-center?style=flat-square&color=2563eb)](LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-16a34a?style=flat-square)](CONTRIBUTING.md)
+
+[**Download**](https://github.com/youminhan/agent-command-center/releases/latest) ·
+[Features](#features) ·
+[Quick start](#quick-start) ·
+[How it works](#how-it-works) ·
+[FAQ](#faq) ·
+[Contributing](#contributing)
+
+<br>
+
+<img src="assets/overview.png" alt="Agent Command Center overview: tmux sessions, Copilot sessions, memory by session, suggestions and auto-save status" width="920">
+
+</div>
+
+<br>
 
 ## Why
 
-- **Your machine restarts and tmux is gone.** Agent Command Center saves every tmux session in the
-  background and puts it back, with its windows, panes, folders and screen contents.
-- **AI coding agents pile up.** Each idle Copilot CLI session can hold a gigabyte or more. See them all,
-  what they were doing, and stop, resume or delete them.
-- **One place, no terminal juggling.** A Dock app and a menu-bar icon, with nothing to configure.
+You run long tmux sessions and a handful of AI coding agents. Then:
 
-## Screenshots
+- **macOS restarts and every tmux session is gone**, along with its layout and history.
+- **Idle agents quietly hold a gigabyte or more each**, and you can't tell which tab is which.
+- **Old agent sessions pile up on disk**, and finding the one you want means scrolling `--resume` IDs.
 
-<p align="center"><img src="assets/overview.png" alt="Overview: metrics, memory by session, suggestions and recent Copilot sessions" width="900"></p>
-
-<table>
-  <tr>
-    <td><img src="assets/copilot.png" alt="A Copilot session's summary in the side panel"></td>
-    <td><img src="assets/tmux.png" alt="tmux sessions with memory bars"></td>
-  </tr>
-  <tr>
-    <td align="center"><sub>Copilot: summary, next steps, PRs and files in a side panel</sub></td>
-    <td align="center"><sub>tmux sessions with memory use and the Copilot session inside</sub></td>
-  </tr>
-  <tr>
-    <td><img src="assets/palette.png" alt="Command palette"></td>
-    <td><img src="assets/snapshots.png" alt="Snapshots grouped per session"></td>
-  </tr>
-  <tr>
-    <td align="center"><sub>⌘K command palette: jump to anything</sub></td>
-    <td align="center"><sub>Snapshots: one row per session, history underneath</sub></td>
-  </tr>
-  <tr>
-    <td><img src="assets/cleanup.png" alt="Clean up rules with a preview"></td>
-    <td><img src="assets/settings.png" alt="Settings"></td>
-  </tr>
-  <tr>
-    <td align="center"><sub>Clean up: rules and a preview before anything is deleted</sub></td>
-    <td align="center"><sub>Settings: auto-save, terminal and restore</sub></td>
-  </tr>
-</table>
-
-<sub>Screenshots use demo data. Regenerate them with <code>scripts/screenshots.sh</code>.</sub>
+Agent Command Center keeps all of it saved, visible and one click away.
 
 ## Features
 
-**tmux**
+<table>
+<tr>
+<td width="50%" valign="top">
 
-- **Auto-save** every session in the background, even when the app is closed (every 1 to 60 minutes).
-- **Restore** a session's windows, panes, layout, folders and screen output after a reboot.
-  Saved commands are typed back in, and run if you choose.
-- **Memory per session**, and which Copilot session is running inside it.
-- **Attach, save, close or kill** from the window or the menu bar.
-- **Snapshots grouped per session.** Auto-saves thin out over time: all from the last hour,
-  then one per hour for a day, then one per day for as long as you choose.
+### 🖥 tmux, saved and restorable
+- Background **auto-save** of every session (every 1–60 min), even with the app closed
+- **Restore** windows, panes, layout, folders and screen output after a reboot
+- **Memory per session**, and which agent runs inside it
+- Attach, save, close or kill from the window, menu bar or <kbd>⌘K</kbd>
+- Snapshots **thin out over time**: every save for an hour, then hourly, then daily
 
-**Copilot CLI**
+</td>
+<td width="50%" valign="top">
 
-- **Every session in one list:** running ones with memory and where they run (tmux, Termius, iTerm…),
-  and all saved ones, searchable.
-- **Summaries:** the latest checkpoint overview, next steps, last request and reply,
-  PRs and commits, and files touched, read from Copilot's own local records.
-- **Resume** in your terminal, or **in tmux**: a new tmux session or a new window in an existing one.
-- **Move to tmux:** take a session running in a plain terminal tab and continue it inside tmux,
-  so it survives closing the window.
-- **Stop** to free memory, **Delete** to free disk (moved to the Trash).
+### ✦ Copilot CLI agents, under control
+- **Every session** in one list: running ones with memory and where they run, saved ones searchable
+- **Summaries** from Copilot's own records: overview, next steps, last request, PRs, files
+- **Resume** in your terminal, or **in tmux** as a new session or a window in an existing one
+- **Move to tmux**: rescue an agent running in a plain tab so it survives closing the window
+- **Stop** to free memory, **Delete** to free disk (moved to the Trash)
 
-**Clean up**
+</td>
+</tr>
+<tr>
+<td valign="top">
 
-- Delete snapshots older than N days, always keeping each session's latest.
-- Save and close tmux sessions that have been idle for N days.
-- Delete Copilot sessions inactive for N days.
-- Preview what will happen first, or run it automatically after each auto-save.
+### 🧹 Clean up with a preview
+- Delete snapshots older than N days, always keeping each session's latest
+- Save and close tmux sessions idle for N days
+- Delete agent sessions inactive for N days
+- See exactly what will happen first, or run it after every auto-save
 
-## Installation
+</td>
+<td valign="top">
 
-1. Download **AgentCommandCenter.dmg** from the [latest release](https://github.com/youminhan/agent-command-center/releases/latest).
-2. Open it and double-click **Install.command**. It copies the app to Applications and opens it.
+### ⚡ Built like a native tool
+- Native Dock app and **menu-bar icon**, translucent sidebar, light and dark
+- **Command palette** <kbd>⌘K</kbd> and shortcuts for everything
+- Keyboard and screen-reader friendly; respects Reduce Motion
+- **No account, no telemetry, no network**: it all stays on your Mac
 
-   Or drag **Agent Command Center** to Applications. The app isn't notarized yet, so the first time
-   right-click it and choose **Open**.
+</td>
+</tr>
+</table>
 
-On first launch it sets up its data folder, the background auto-save job and open-at-login.
-Nothing else to configure.
+<details>
+<summary><b>More screenshots</b></summary>
+<br>
+
+| Copilot session summary | tmux sessions |
+|---|---|
+| <img src="assets/copilot.png" alt="A Copilot session's summary in the side panel"> | <img src="assets/tmux.png" alt="tmux sessions with memory bars"> |
+| **Command palette** | **Snapshots** |
+| <img src="assets/palette.png" alt="Command palette"> | <img src="assets/snapshots.png" alt="Snapshots grouped per session"> |
+| **Clean up** | **Settings** |
+| <img src="assets/cleanup.png" alt="Clean up rules with a preview"> | <img src="assets/settings.png" alt="Settings"> |
+
+<sub>Screenshots use demo data, generated by <code>scripts/screenshots.sh</code>.</sub>
+</details>
+
+## Quick start
+
+1. **Download** `AgentCommandCenter.dmg` from the [latest release](https://github.com/youminhan/agent-command-center/releases/latest).
+2. **Open it and double-click `Install.command`.** It copies the app to Applications and launches it.
+3. **That's it.** On first launch it creates its data folder, starts background auto-save and adds itself to login items.
+
+> [!NOTE]
+> The app isn't notarized yet. If you drag it to Applications instead of using `Install.command`,
+> right-click the app and choose **Open** the first time.
 
 ### Requirements
 
 | | |
 |---|---|
-| macOS | 13 Ventura or later, Apple Silicon or Intel |
-| tmux | `brew install tmux` |
-| Python 3 | Homebrew's, or Apple's (`xcode-select --install`) |
-| Copilot CLI | optional, for the Copilot features |
+| **macOS** | 13 Ventura or later, Apple silicon or Intel |
+| **tmux** | `brew install tmux` |
+| **Python 3** | Homebrew's, or Apple's via `xcode-select --install` |
+| **Copilot CLI** | Optional, for the agent features |
 
-The app tells you if something is missing.
+The app tells you if something is missing and how to install it.
 
 ## Usage
 
-| Where | What |
+| Where | What you get |
 |---|---|
-| **Dock / window** | The full app: Overview, Sessions, Snapshots, Copilot, Clean up and Settings. |
-| **Menu bar** (▥ icon) | Running sessions, Save All, Restore, and Copilot memory at a glance. |
-| **Attach** | Opens the session in iTerm or Terminal. Using Termius, Warp or another terminal? Set **Settings → Terminal → Copy command** and paste it. |
-| **Copilot command** | Set **Settings → Copilot command** to how you start Copilot, for example `copilot --yolo`. |
+| **Window** | Overview, Sessions, Snapshots, Copilot, Clean up and Settings |
+| **Menu bar** | Running sessions, Save All, Restore and agent memory at a glance |
+| **<kbd>⌘K</kbd>** | Jump to any session, agent or snapshot, or run an action |
 
-### Keyboard
+### Keyboard shortcuts
 
 | Keys | Action |
 |---|---|
-| <kbd>⌘K</kbd> | Command palette: sessions, Copilot, snapshots and actions |
-| <kbd>⌘1</kbd>–<kbd>⌘6</kbd> | Switch pages |
-| <kbd>/</kbd> | Filter Copilot sessions |
+| <kbd>⌘</kbd> <kbd>K</kbd> | Command palette |
+| <kbd>⌘</kbd> <kbd>1</kbd> … <kbd>6</kbd> | Switch pages |
+| <kbd>/</kbd> | Filter agent sessions |
 | <kbd>esc</kbd> | Close the panel, palette or dialog |
 
-### Where things live
+## Configuration
+
+Everything is in **Settings** and saves as you change it.
+
+| Setting | Default | Notes |
+|---|---|---|
+| Auto-save | On, every 5 min | Runs in the background via a LaunchAgent |
+| Keep auto-saves for | 1 week | All from the last hour, then hourly, then daily |
+| Open sessions in | Automatic | iTerm if it's open, otherwise Terminal. Use **Copy command** for Termius, Warp and others |
+| Copilot command | `copilot` | How you start Copilot, for example `copilot --yolo` |
+| Restore: show previous output | On | Prints the saved screen back into each pane |
+| Restore: run saved commands | Off | Otherwise they're typed but not run |
+
+<details>
+<summary><b>Where files live</b></summary>
+<br>
 
 | | |
 |---|---|
 | Snapshots and settings | `~/Library/Application Support/Agent Command Center/` |
 | Auto-save job | `~/Library/LaunchAgents/com.agentcommandcenter.autosave.plist` |
-| Copilot sessions (read) | `~/.copilot/session-state/` and `~/.copilot/session-store.db` |
+| Copilot sessions (read, and moved to the Trash on delete) | `~/.copilot/session-state/` and `~/.copilot/session-store.db` |
+</details>
 
-### Uninstall
+## How it works
+
+```
+┌────────────────────────┐   JSON over 127.0.0.1   ┌─────────────────────┐
+│ Agent Command Center   │ ──────────────────────▶ │ app.py              │ ──▶ tmux
+│ Swift: window, menu    │                         │ Python, stdlib only │ ──▶ ~/.copilot (read)
+│ bar, LaunchAgent       │ ◀── ui.html (WebKit) ── │                     │ ──▶ snapshots
+└────────────────────────┘                         └─────────────────────┘
+            ▲
+            └── launchd runs `app.py --save-all` every minute; it saves only when due.
+```
+
+- **`app.py`**: a small, dependency-free server that talks to `tmux`, reads Copilot's local session files and serves the UI and a JSON API.
+- **`ui.html`**: the whole interface in one file. No build step, no framework.
+- **`macapp/`**: the native Swift shell: window, menu bar, terminal integration, login item, auto-save job, and the icon drawn in code.
+
+### Privacy and security
+
+- Runs entirely on your Mac and makes **no network requests**.
+- The server listens on **`127.0.0.1` only**. Requests that change anything need a custom header, so other websites can't trigger them.
+- Copilot data is only read, except **Delete**, which moves a session folder to the Trash.
+
+Found a problem? See [SECURITY.md](SECURITY.md).
+
+## FAQ
+
+<details>
+<summary><b>Does it work with Claude Code, Codex or other agents?</b></summary>
+<br>
+tmux features work with anything you run in tmux. The agent features currently read GitHub Copilot CLI's session files. Support for other agents is on the <a href="#roadmap">roadmap</a>.
+</details>
+
+<details>
+<summary><b>Will restoring a session restart my programs?</b></summary>
+<br>
+It recreates windows, panes, layout and folders, and types each pane's last command back in. Commands only run if you turn on <b>Run saved commands</b>. Copilot sessions come back with <code>--resume</code>, so the conversation continues.
+</details>
+
+<details>
+<summary><b>I use Termius, Warp or another terminal.</b></summary>
+<br>
+Set <b>Settings → Terminal → Copy command</b>. Attach and Resume copy the command so you can paste it anywhere.
+</details>
+
+<details>
+<summary><b>Can I use it without the Mac app?</b></summary>
+<br>
+Yes. Run <code>python3 app.py</code> and open <code>http://127.0.0.1:8765</code>. Add <code>python3 app.py --save-all</code> to cron or launchd for auto-save.
+</details>
+
+<details>
+<summary><b>How do I uninstall it?</b></summary>
+<br>
 
 ```sh
 launchctl bootout gui/$(id -u)/com.agentcommandcenter.autosave
 rm ~/Library/LaunchAgents/com.agentcommandcenter.autosave.plist
-rm -rf "/Applications/Agent Command Center.app" "$HOME/Library/Application Support/Agent Command Center"
+rm -rf "/Applications/Agent Command Center.app" \
+       "$HOME/Library/Application Support/Agent Command Center"
 ```
+</details>
 
 ## Building from source
 
 ```sh
 git clone https://github.com/youminhan/agent-command-center.git
 cd agent-command-center/macapp
-./build.sh            # builds the app and dist/AgentCommandCenter.{dmg,zip}
-./build.sh --install  # also installs it into /Applications and opens it
+./build.sh --install   # universal app in /Applications, plus dist/*.dmg and *.zip
 ```
 
-Needs the Xcode Command Line Tools (`swiftc`). No other dependencies.
+Needs only the Xcode Command Line Tools. To work on the UI, run `python3 app.py` and reload the browser.
 
-You can also run the backend on its own and use it in a browser:
+## Roadmap
 
-```sh
-python3 app.py --port 8765        # then open http://127.0.0.1:8765
-python3 app.py --save-all --force # take an auto-save now
-```
+- [ ] Homebrew cask
+- [ ] Signed and notarized releases
+- [ ] Claude Code and Codex session support
+- [ ] Restore running programs, not just their commands
+- [ ] Per-session notes and tags
 
-### How it works
+Have an idea? [Open an issue](https://github.com/youminhan/agent-command-center/issues/new/choose).
 
-- `app.py` is a small, dependency-free Python server. It talks to `tmux`, reads Copilot's local
-  session files, and serves a JSON API on `127.0.0.1` only. Write requests need a custom header,
-  so other websites can't call it.
-- `ui.html` is the interface: a sidebar app with a command palette, light and dark mode, full keyboard
-  support and reduced-motion support.
-- `macapp/` is a native Swift wrapper: Dock app, menu-bar icon, window, terminal integration and the
-  auto-save LaunchAgent. The app icon is drawn in code (`icon.swift`).
+## Contributing
+
+Contributions are welcome, from typo fixes to new features. Read [CONTRIBUTING.md](CONTRIBUTING.md) to get set up, and see [CHANGELOG.md](CHANGELOG.md) for what's changed.
 
 ## License
 
-[Apache License 2.0](LICENSE)
+[Apache License 2.0](LICENSE) © Youmin Han
